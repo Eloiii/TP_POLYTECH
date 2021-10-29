@@ -6,8 +6,6 @@ author:
 date: 21/10/2021
 # Pour des marges un peu plus petites
 geometry: margin=20mm
-# Table des matieres
-toc: true
 # Numerotation des sections
 numbersections: true
 ---
@@ -64,14 +62,16 @@ Nous pouvons remarquer qu'en utilisant cet aglorithme, les résultats sont globa
 | 75  | 2111485077978055| 0 |
 | 100 | -9223372036854775808 | 0 |
 
-La complexité de cet algorithme est de $\mathcal{O}(**??**)$
+La complexité de cet algorithme est de $\mathcal{O}(2log{_2}{n})$ puisque nous appelons deux fois la fonction `exponentiation_rapide` et qu'à chaque tour de récursion de celle-ci, nous divisons n par 2.
 
 ## Matrices
+
+Pour l'algorithme utilisant des matrices, nous remarquons également un temps de réponse instantané. De plus, toutes les résultats sont justes. Cet algorithme utilise la fonction `exponentiation_rapide_mat` pour effectuer une puissance de matrice. Cet algortihme possède une complexité de $\mathcal{O}(log{_2}{n})$ puisque nous divisons par 2 notre paramètre n d'entrée à chaque récursion.
 
 | N   | Résultat  | Temps |
 |-----|-----------|-------|
 | 10  | 55        | 0     |
 | 20  | 6765      | 0     |
 | 40  | 102334155 | 0    |
-| 75  | 2111485077978055| 0 |
+| 75  | 2111485077978050| 0 |
 | 100 | 3736710778780434371 | 0 |
