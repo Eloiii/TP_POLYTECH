@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/eloi/Prog-C/Atelier 1/task4/string.c
+
+/home/eloi/Prog-C/Atelier 1/task7/pendu.c
+stdint.h
+-
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+fcntl.h
+-
+string.h
+-
+time.h
+-
+../task4/string.c
+/home/eloi/Prog-C/Atelier 1/task4/string.c
+

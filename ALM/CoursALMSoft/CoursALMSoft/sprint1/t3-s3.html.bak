@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Workshop: Programming Basics</title>
+    <meta name="CHANGEDBY" content="Pr. Olivier Gruber">
+    <link rel="stylesheet" href="../style.css" type="text/css">
+    <script src="../common.js"></script>
+    <script src="../quizz.js"></script>
+    <link rel="stylesheet" href="../highlight.js/styles/default.css">
+    <script src="../highlight.js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </head>
+  <body onload="shellOnLoad()">
+    <script>
+      function shellOnLoad() {
+        multiLang();
+        /*hljs.initHighlightingOnLoad(); */
+        _quizzes = new Array();
+        parseQuizzes();
+      }  
+    </script>
+    <div id="outer-container">
+      <div id="header">
+        <div id="logo"> <img src="../logo_uga.png" alt="Université Grenoble-Alpes"
+            height="100"
+            border="0">
+          <img src="../logo_reseau_polytech.gif" alt="Polytech" height="80" border="0">
+        </div>
+        <div id="top-links"> <a href="../index.html">Home</a> </div>
+      </div>
+      <div id="inner-container">
+        <h1>Bases du langage C<br>
+        </h1>
+        <h2>Task3 -- Des variables globales<br>
+        </h2>
+        <h3>Step3 --&nbsp; <br>
+        </h3>
+        <p>Passez dans le répertoire task3s3C.</p>
+        <p>Voici un programme C (var.c) utilisant des variables globales:<span style="font-family: monospace;"><br>
+          </span></p>
+        <pre><code class="c">
+        /************************************************************
+       &nbsp;* variable globale
+       &nbsp;* *********************************************************** */<br>
+          int n;
+          int i;
+          int x;
+          
+          int main ()
+          {
+          &nbsp; i=3;
+          &nbsp; x=1;
+          &nbsp; n=i+x;
+          }
+          </code></pre>
+        <p>Les variables n, i et x sont dites <span style="font-weight: bold;">globales</span>
+          car on pourra y accéder de n'importe quelle fonction du programme C.</p>
+        <p>Compilez ce programme et observez le code assembleur dans <span style="font-weight: bold;">var.s</span>.</p>
+        <p>Exécutez en pas en pas sous gdb, il est conseillé d'observez le code
+          à l'aide de <span style="font-weight: bold; font-style: italic;">layout
+            split</span></p>
+        <p>Répondez aux questions suivantes :<br>
+        </p>
+        <ul>
+          <li><span style="font-family: Arial,Serif;">Où sont stockées les
+              adresses des variables n, i et x dans le programme assembleur ?</span></li>
+          <li><span style="font-family: Arial,Serif;">Quelle est l'instruction
+              assembleur qui permet de récupérer dans un registre l'adresse de
+              la variable x ?<br>
+            </span></li>
+          <li><span style="font-family: Arial,Serif;">Donnez l'adresse exacte
+              (en hexadécimal) où est stockée l'adresse de la variable x.<br>
+            </span></li>
+          <li><span style="font-family: Arial,Serif;">Donnez l'adresse exacte
+              (en hexadécimal) où est stockée la variable x.</span></li>
+          <li><span style="font-family: Arial,Serif;">A savoir la directive <span
+                style="font-weight: bold; font-style: italic;">.comm
+                x, 4, 4</span> permet de réserver en mémoire 4 octets référencés
+              par l'étiquette x.<br>
+            </span></li>
+          <li><span style="font-family: Arial,Serif;">Quelle instruction
+              assembleur effectue l'affectation de la variable x par la valeur 1
+              ?</span></li>
+          <li><span style="font-family: Arial,Serif;">Quelle est l'instruction
+              assembleur qui réalise l'addition de la valeur de x et de i ?</span></li>
+          <li><span style="font-family: Arial,Serif;">Quelles sont les
+              instructions assembleur qui permettent de réaliser n= x + i ? <br>
+            </span></li>
+          <li><span style="font-family: Arial,Serif;">Vérifiez auprès d'un autre
+              étudiant ou d'un enseignant que vos réponses aux questions
+              précédentes sont justes.<br>
+            </span></li>
+        </ul>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <p> </p>
+        <div id="footer"> © IM2AG
+          <div id="bottom-links" style="float: right;"> <a href="../index.html">Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+</html>

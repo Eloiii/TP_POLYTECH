@@ -1,0 +1,209 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en-US" >
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Workshop: Programming Basics</title>
+    <meta name="CHANGEDBY" content="Pr. Olivier Gruber">
+    <link rel="stylesheet" href="../style.css" type="text/css"/> 
+    <script src="../common.js"></script>
+    <script src="../quizz.js"></script>
+    <link rel="stylesheet"
+      href="../highlight.js/styles/default.css">
+    <script src="../highlight.js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>    
+  </head>
+
+  <body onload="shellOnLoad()">
+
+    <script>
+      function shellOnLoad() {
+        multiLang();
+        /*hljs.initHighlightingOnLoad(); */
+        _quizzes = new Array();
+        parseQuizzes();
+      }  
+    </script>
+    
+    <div id="outer-container" >
+      <div id="header" >
+	<div id="logo" >
+	  <img src="../logo_uga.png" height="100" border="0" alt="Université Grenoble-Alpes" />
+	  <img src="../logo_reseau_polytech.gif" height="80" border="0" alt="Polytech" />
+	</div>
+	<div id="top-links">
+	  <a href="../index.html">Home</a> 
+	</div>
+      </div>
+      <div id="inner-container" >
+	
+	<h1>Bases de l'assembleur</h1>
+
+	<h2>Task3 -- Accès à la mémoire</h2>
+
+	<h3>Step4 -- Somme des éléments d'un tableau sous forme de fonction </h3>
+
+	<p>
+	  Maintenant, nous avons un morceau de code pour additionner
+les éléments d'un tableau. Ce tableau peut être n'importe où dans la
+mémoire. Essayons d'en faire une fonction qui peut être réutilisée.
+	</p>
+	<ol>
+	  <li>Allez dans le répertoire de la <span style="font-style: italic;">sprint1/task3</span><br></li>
+	  <li>Ajouter un fichier source sum.s</li>
+	  <li>Modifier le makefile</li>
+	  <li>Créer la fonction _sum</li>
+	</ol>
+
+	<quizz id="id_quizz1" name="quizz1" >
+	  <question>
+	    <p>
+	      Avez vous exécuté et debogué votre fonction ?
+	    </p>
+	    <checkboxes>
+	      <checkbox>Yes</checkbox>
+	      <checkbox>No</checkbox>
+	    </checkboxes>
+	    <answers>
+	      <answer checks="CU">
+		Magnifique!
+	      </answer>
+	    </answers>
+	  </question>
+	</quizz>
+	<div id="id_quizz1_next" style="display: none">
+	
+	<quizz id="id_quizz2" name="quizz2" >
+	  <question>
+	    <p>
+	      Combien de paramètres possède votre fonction ?
+	    </p>
+	    <checkboxes>
+	      <checkbox>Zero</checkbox>
+	      <checkbox>One</checkbox>
+	      <checkbox>Two</checkbox>
+	      <checkbox>Three</checkbox>
+	    </checkboxes>
+	    <hints>
+	      <hint checks="C???">
+		Zéro argument? Vraiment? Comment utiliseriez-vous cette fonction avec des tableaux différents? 
+	      </hint>
+	      <hint checks="?C??">
+		Un seul argument? Vraiment? Nous supposons que vous passez l'adresse du tableau, mais comment votre fonction connaît-elle sa longueur ?
+	      </hint>
+	      <hint checks="???C">
+		Trois arguments? Pourquoi? Deux arguments semblent suffisants... 
+	      </hint>
+	    </hints>
+	    <answers>
+	      <answer checks="UUCU">
+		Deux arguments, à coup sûr. Nous espérons que ces deux arguments sont l'adresse du tableau et sa longueur (exprimée en termes de nombre d'éléments que contient le tableau). 
+	      </answer>
+	    </answers>
+	  </question>
+	</quizz>
+	<div id="id_quizz2_next" style="display: none">
+	  <quizz id="id_quizz3" name="quizz3" >
+	    <question >
+	      <p>
+		Votre fonction pourrait elle être utilisée avec des tableaux de
+taille différentes ?
+	      </p>
+	      <checkboxes>
+		<checkbox>Yes</checkbox>
+		<checkbox>No</checkbox>
+	      </checkboxes>
+	      <hints>
+		<hint checks="UC">
+		  Il semble que vous ayez besoin d'aide. Vous
+pourriez demander de l'aide à un autre étudiant qui a réussi ?
+		</hint>
+	      </hints>
+	      <answers>
+		<answer checks="CU">
+		  Fantastique. Laissez-nous
+vous montrer comment nous aurions écrit cette fonction. Il est toujours
+intéressant de lire le code
+d'autres développeurs, ainsi on apprend en général beaucoup de chose.
+		</answer>
+		<answer checks="U?">
+		  Et bien vous ferez mieux la prochaine fois.<br>
+Laissez nous vous montrer à quoi cela pourrait ressembler.
+		</answer>
+	      </answers>
+	      <finally>
+	      </finally>
+	    </question>
+	  </quizz>
+	  <div id="id_quizz3_next" style="display: none">
+	    <p>
+	      Voici le code que l'on pourrait avoir dans le fichier <em>start.s</em>:
+	    </p>
+	    <pre><code class="arm">
+.global _start
+_start:
+	mov sp, #0xFF
+	ldr r0,[pc]    // load the array address in r0
+	b   .L6
+	.word array
+.L6:
+	mov r1,#4      // load the array length in r1
+	bl _sum        // make the call to the function _sum
+_halt:
+	b _halt
+	
+array:
+	.word 0x00
+	.word 0x01
+	.word 0x02
+	.word 0x03
+	    </code></pre>
+	    <p>
+	      Dans le fichier <em>sum.s</em>,nous pourrions avoir quelque chose comme ça:
+	    </p>
+	    <pre><code class="arm">
+/*
+ * A function that computes the sum of the elements of an array.
+ * The array address is given in r0
+ * The array length is given in r1
+ * Returns the sum in r2.
+ * Clobbered registers: r0,r1,r2,r3,r4
+ */
+	.align 2
+.global _sum
+	.type _sum,%function
+	.func _sum,_sum
+_sum:
+	ldr r0,[pc]
+	b   .L6
+	.word array
+.L6:	
+	mov r2, #0  // the index
+	mov r3, #0  // the sum
+.L7:
+	cmp r2, r1             // compare the index and length
+	bge .L8                // done if index greater or equal
+	ldr r4, [r0,r2,lsl#2]  // read next value (32bit word)
+	add r3, r3, r4         // add the value to the sum
+	add r2,r2,#1           // increment the index
+	b .L7
+.L8:
+	mov r2,r3
+	mov pc,lr
+	.size	_sum, .-_sum
+	.endfunc 
+	    </code></pre>
+
+	  </div id="id_quizz3_next">
+	</div id="id_quizz2_next">
+
+	    
+	<div id="footer" >
+	  &copy; UFR IM2AG
+	  <div id="bottom-links" style="float: right">
+	    <a href="../index.html">Home</a> 
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

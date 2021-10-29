@@ -1,0 +1,209 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en-US" >
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Basics Workshop</title>
+    <meta name="CHANGEDBY" content="Pr. Olivier Gruber">
+    <link rel="stylesheet" href="style.css" type="text/css"/> 
+    <script src="common.js"></script>
+  </head>
+
+  <body onload="shellOnLoad()">
+
+    <script>
+      function shellOnLoad() {
+        multiLang();
+      }  
+    </script>
+
+    <div id="outer-container" >
+      <div id="header" >
+	<div id="logo" >
+	  <img src="logo_uga.png" height="100" border="0" alt="Université Grenoble-Alpes" />
+	  <img src="logo_reseau_polytech.gif" height="80" border="0" alt="Polytech" />
+	</div>
+	<div id="top-links">
+	  <a href="index.html">Home</a> 
+	</div>
+      </div>
+      <div id="inner-container" >
+	
+	<h1>Methodology Basics</h1>
+	
+	<p>
+	  We will have only a few advices here, for a quick start.
+	  <xfr>
+	    Nous n'aurons ici que quelques conseils, afin de ne pas ralentir vos débuts.
+	  </xfr>
+	</p>
+
+	<h2> A Word of Warning </h2>
+	<p>
+	  Shell commands are powerfull and
+	  therefore may harm your computer. So be cautious and think
+	  twice before hitting enter.
+	  <xfr>
+	    Les commandes du shell sont puissantes
+	    et elles peuvents endommager votre machine (perte de données,
+	    impossibilité de vous connecté, etc.). Soyez prudent et
+	    toujours bien vérfier vos commandes avant de les valider
+	    avec la touche "enter".
+	  </xfr>
+	</p>
+
+	<h2>Finding Help</h2>
+	<p>
+	  Knowning how to find help is crucial, but being autonomous
+	  is also equally important. It is a subtle balance between
+	  asking too many questions and asking not enough. This is 
+	  a question of methodology, avoiding the over-use of Google
+	  and limiting the carbon footprint of the Internet.
+	  <xfr>
+	    Savoir trouver de l'aide est crucial, mais être autonome
+	    est tout aussi important. C'est une question d'équilibre
+	    entre poser trop de questions ou pas assez. C'est une question
+	    de méthode, pour éviter la sur-utilisation de Google
+	    et ainsi limiter l'empreinte carbon de l'Internet.
+	  </xfr>
+	</p>
+	<p>
+	  For almost everything in Linux, there is documentation
+	  available. Before going wandering across the Web, please
+	  try the documentation that is locally available on your
+	  machine. The planet will thank you since it reduces the
+	  carbon dioxide emission due to the Web. Also, the local
+	  documentation is the correct one and it is up to date.
+	  To get help,
+	  let's say on a command called <em>ls</em>, simply type
+	  the following:
+	  <xfr>
+	    Et vous obtenez la documentation complète de la commande.
+	    Toutes les commandes du shell sont ainsi décrites dans
+	    la documentation qui est installée sur la machine Linux
+	    que vous utilisez. Pensez toujours à faire «man» avant
+	    de faire Google… C’est écologique car cela ne demande pas
+	    de faire appel à l’infrastructure de l’internet, augmentant
+	    la facture énergétique du Web et donc les emissions de CO2.
+	    Mais aussi, la documentation locale est la bonne,
+	    elle est à jour, et souvent bien plus claire que ce
+	    que vous trouverez sur le Web. Bien sûr, comme vous
+	    le savez parfaitement, le Web est un complément formidable,
+	    ne vous en privez pas.
+	    Pour obtenir de l'aide localement, pour une commande
+	    appelée <em>ls</em>, tapez:
+	  </xfr>
+	</p>
+	<textarea class="terminal" rows="2" width="60%" >
+ $ man ls
+	</textarea>
+	<p>
+	  Nothing simpler. Of course, you may also go to the Web
+	  and search answers through your favorite search engines.
+	  <b>But do not forget that learning is best approach as a team
+	  effort, so ask your camarades and the teaching staff.</b>
+	  <xfr>
+	    Vous pouvez bien sûr aussi aller sur la toile et chercher
+	    des réponses par le biais de vos moteurs de recherche
+	    favoris. Mais n'oubliez pas que l'apprentissage est plus
+	    efficace à plusieurs, demandez à vos camarades et vos enseignants.
+	  </xfr>
+	</p>
+
+	<h2>Team Effort</h2>
+
+	<p>
+	  <b>But do not forget that learning is best approach as a team
+	  effort, so ask your camarades and the teaching staff.</b>
+	  <xfr>
+	    Mais n'oubliez pas que l'apprentissage est plus
+	    efficace à plusieurs, demandez à vos camarades et vos enseignants.
+	  </xfr>
+	</p>
+	
+	<p>
+	  Therefore, we advise you to keep a laboratory book, called a labbook,
+	  writting down what you have learned. Believe us, you will forget
+	  commands and details. You can either spend hours again trying to figure
+	  out what commands you did use and they worked, or you can have write
+	  it down. Not only your labbook will there if you need it later,
+	  but writting down what you learn is the best way to make it stick.
+	  <xfr>
+	    En conséquence, nous vous conseillons de maintenir un cahier de
+	    laboratoire, que nous appelerons "labbook". Croyez nous, vous
+	    allez oublier les commandes et les détails de leurs utilisations.
+	    Vous pouvez passer des heures à refaire le travail de recherche
+	    et de compréhension, maintes fois, ou vous pouvez tenir votre
+	    labbook. Non seulement il sera là pour retrouver vite ce que vous
+	    savez déjà, mais écrire ce que vous apprenez est le meilleur moyen
+	    d'aider la mémorisation.
+	  </xfr>
+	</p>
+	<p>
+	  Moreover, you can use your labbook to help others. It is crucial
+	  that you all build skills and knowledge and that you share them.
+	  Through the years, it is one of the greatest weaknesses of yours.
+	  Students do not share skills and knowledge efficiently, effectively
+	  hindering the progress of the team. A labbook will help in that
+	  respect as it will be fast and easy to go back and locate the
+	  needed information for a fellow student in need.
+	  <xfr>
+	    De plus, vous pourrez utiliser votre labbook pour aider les autres.
+	    Il est fondamentale que vous appreniez des connaissances et des savoirs
+	    et que vous puissiez les partager. Chaque année, nous constatons que
+	    c'est une des grandes faiblesses de nos étudiants, ils ne partagent
+	    pas bien leurs connaissances et leurs savoirs. Si vous avez votre labbook,
+	    il vous sera facile de l'utiliser pour aider un étudiant dans le besoin.
+	  </xfr>				
+	</p>
+
+	<h2>Improve over time</h2>
+	<p>
+	  We do not understand why, but it seems that most of you will learn
+	  one way to do something and will stop there. Three years later, they
+	  will still do it the same way. This is not a good idea, this is not
+	  efficient. You need to keep improving, throughout the years.
+	  <xfr>
+	    Nous ne comprenons pas bien pourquoi, mais il semble que certains d'entre vous
+	    apprennent une première façon de faire quelque chose et ils en resteront là. Trois
+	    ans plus tard, ils feront toujours la même chose, de le même manière. Ce n'est pas
+	    une bonne idée du tout. Vous devez continuer à vous améliorer.
+	  </xfr>
+	</p>
+	<p>
+	  Let's take a few examples. Many type on their keyboard with two fingers, loosing
+	  a lot of time when compared to using all their fingers. Many will only learn 10%
+	  of the capabilities of the tools of their trade: shell, debugger, programming editors, etc.
+	  Again, imagine the loss of time over 10 years of programming!
+	  <xfr>
+	  Prenons quelques exemples. Beaucoup tape sur le clavier avec 2 doigts... et n'apprendrons
+	  jamais à taper professionnellement avec tous leurs doigts. Quelle perte de temps sur 10 ans!
+	  Beaucoup apprendrons quelques commandes du shell et ne creuseront plus. D'autres n'apprendront
+	  que 10% des possibilités des outils qu'ils utilisent au quotidient, comme le debugger ou
+	  leur environnement de développement. Encore une fois, quelle perte de temps sur 10 ans!
+	  </xfr>
+	</p>
+	<p>
+	  You need to realize that becoming a good developer is not going to happen in a day.
+	  You need also to realize that the tools are complex and learning what they can do
+	  all at once is not going to happen. So you need to have a methodology of incremental
+	  improvements. You need to look for the tricks that others have found and that are helping
+	  them be more effective.
+	  <xfr>
+	    Vous devez réaliser que de devenir un bon développeur va prendre du temps.
+	    Vous devez aussi réasliser que les outils sont complexes et que leur apprentissage
+	    va prendre du temps, que tout apprendre d'un coup ne sera pas possible. Il faudra donc
+	    avoir une approche incrémentale, recherchant l'amélioration. Vous devez aussi regarder
+	    comment font les autres et les astuces qu'ils utilisent pour être plus efficace.
+	  </xfr>
+	</p>
+	    
+	<div id="footer" >
+	  &copy; Pr. Olivier Gruber
+	  <div id="bottom-links" style="float: right">
+	    <a href="index.html">Home</a> 
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

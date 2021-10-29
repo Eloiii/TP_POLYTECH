@@ -1,0 +1,5 @@
+
+
+
+erasto: erastoprint.c
+	gcc erastoprint.c -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -Wall -o  erasto

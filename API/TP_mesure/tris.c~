@@ -1,0 +1,135 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+#define NMAX 50000		/* peut etre modifie si necessaire */
+
+
+
+/*
+generation_aleatoire
+Donnees : t : tableau d'entiers de taille > n, n : entier > 0
+Resultat : les valeurs t[0..n-1] ont ete initialisees avec n valeurs aleatoires
+           prises dans [0,2147483647] selon une loi uniforme.
+Pre-condition : le generateur aleatoire doit avoir ete initialise avec "srand"
+*/
+
+void
+generation_aleatoire (int t[], int n)
+{
+  int i;
+
+  for (i = 0; i < n; i++)
+    {
+      t[i] = rand ();
+    };
+}
+
+/*
+generation_aleatoire_non_uniforme
+Donnees : t : tableau d'entiers de taille > n, n : entier > 0
+Resultat : les valeurs t[0..n-1] ont ete initialisees avec n valeurs aleatoires
+           prises dans [0,2147483647].
+Pre-condition : le generateur aleatoire doit avoir ete initialise avec "srand"
+*/
+void
+generation_aleatoire_non_uniforme (int t[], int n)
+{
+  int i;
+  int x = 0;
+
+  for (i = 0; i < n; i++)
+    {
+      t[i] = x;
+      x = x + ((rand () % 10) - 2);
+    }
+}
+
+/*
+tri_insertion
+Donnees : t : tableau d'entiers de taille > n, n : entier > 0
+Resultat : le tableau t est trie en ordre croissant
+*/
+int
+tri_insertion (int t[], int n)
+{
+  int i, j;
+  int f = 0;
+  int Clef;
+
+  for (i = 1; i < n; i++)
+    {
+
+      Clef = t[i];
+
+      j = i - 1;
+
+      /* Decalage des valeurs du tableau */
+      while ((j >= 0) && (t[j] > Clef) && ++f)
+	{
+	  t[j + 1] = t[j];
+	  j = j - 1;
+	}
+
+      /* insertion de la clef */
+      t[j + 1] = Clef;
+    }
+  // printf("f = %d\n", f);
+  return f;
+}
+
+/*
+tri_segmentation
+Donnees : t : tableau d'entiers de taille > n, n : entier > 0
+Resultat : le tableau t est trie en ordre croissant
+*/
+void
+tri_segmentation (int t[], int n)
+{
+  /* A completer */
+}
+
+
+
+void
+lancer_mesures ()
+{
+
+  unsigned int germe;
+  int T[NMAX];
+  int N;
+  int X;
+  int res;
+  int resX;
+  int f;
+
+  printf ("Valeur du germe pour la fonction de tirage aleatoire ? ");
+  res = scanf ("%d", &germe);
+  assert (res == 1);
+  srand (germe);
+
+  do
+    {
+      printf ("Valeur de N ? ");
+      res = scanf ("%d", &N);
+      printf ("Valeur de X ? ");
+      resX = scanf ("%d", &X);
+      assert (res == 1);
+      assert (resX == 1);
+    }
+  while (N < 1 || N > NMAX);
+  int T_f[X];
+  int X_input = X;
+  while (X--)
+    {
+      generation_aleatoire (T, N);	/* initialisation du tableau T */
+      f = tri_insertion (T, N);	/* tri de T */
+      T_f[X_input - (X + 1)] = f;
+    }
+  int somme_f = 0;
+  for (int i = 0; i < X_input; ++i)
+  {
+      somme_f += T_f[i];
+    }
+  printf ("Moyenne de f = %d\n", somme_f / X_input);
+}

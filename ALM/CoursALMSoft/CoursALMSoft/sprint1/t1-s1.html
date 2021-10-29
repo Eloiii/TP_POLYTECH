@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en-US"><head>
+
+
+
+
+
+
+
+  
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"><title>Workshop: Programming Basics</title>
+    
+    <meta name="CHANGEDBY" content="Pr. Olivier Gruber">
+    <link rel="stylesheet" href="../style.css" type="text/css"> 
+    <script src="../common.js"></script>
+    <link rel="stylesheet" href="../highlight.js/styles/default.css">
+    <script src="../highlight.js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script></head><body onload="shellOnLoad()">
+
+    <script>
+      function shellOnLoad() {
+        multiLang();
+        /*hljs.initHighlightingOnLoad(); */
+      }  
+    </script>
+    
+    <div id="outer-container">
+      <div id="header">
+	<div id="logo">
+	  <img src="../logo_uga.png" alt="Université Grenoble-Alpes" border="0" height="100">
+	  <img src="../logo_reseau_polytech.gif" alt="Polytech" border="0" height="80">
+	</div>
+	<div id="top-links">
+	  <a href="../index.html">Home</a> 
+	</div>
+      </div>
+      <div id="inner-container">
+	
+	<h1>Bases de l'assembleur<br>
+</h1>
+
+	<h2>Task1 -- Un flot d'exécution d'instructions<br>
+</h2>
+
+	<h3>Step1 -- On se lance !<br>
+</h3>
+
+	<p>Il faut tout d'abord se placer dans le répertoire correspondant à cette tâche:</p><textarea class="terminal" rows="3">  $ cd workdir/sprint1/task1
+	</textarea>
+<p>où <span style="font-style: italic;">workdir</span> est le répertoire où vous avez déposer les fichiers de l'environnement de cet enseignement.<br>
+</p>
+
+
+	<p>Le fichier <span style="font-weight: bold; font-style: italic;">Makefile</span> permet de construire/exécuter un ensemble de
+programmes, généralement en plusieurs étapes, à partir de différents
+fichiers. Vous l'utiliserez plusieurs fois dans les années à venir. C'est un
+classique.</p>
+<p>Dans notre makefile simple (regardez le contenu du fichier <span style="font-style: italic;">Makefile</span>), il y a quatre cibles qui vous intéressent en ce moment: <span style="font-style: italic;">all</span>, <span style="font-style: italic;">clean</span>, <span style="font-style: italic;">qemu</span> et <span style="font-style: italic;">gdb</span>. Pour tout nettoyer et ensuite tout construire, il suffit de taper:
+	  
+	</p>
+
+
+	<textarea class="terminal" rows="3">  $ make clean
+  $ make
+	</textarea>
+	<p>Le
+makefile permet de rappeler seulement les commandes concernées par des
+fichiers qui ont été modifiés depuis le dernier appel du makefile. La
+première commande n'est pas nécessaire à chaque fois, elle permet de
+nettoyer les vieilles versions de fichiers créés par le makefile.</p>
+<p>Regardons ce qui se passe quand vous faites: <br>
+
+	</p>
+
+	
+	
+	<textarea class="terminal" rows="5">  $ make
+  /usr/bin/arm-none-eabi-as -mcpu=arm926ej-s -gstabs+ start.s -o start.o
+  /usr/bin/arm-none-eabi-ld -T ldscript start.o -o kernel.elf
+  /usr/bin/arm-none-eabi-objcopy -O binary kernel.elf kernel.bin
+  $	  
+	</textarea>
+	<p>Comme vous pouvez le voir, il y a ici plusieurs étapes:
+	</p>
+	<ul>
+	  <li>Compilation (<span style="font-style: italic;">as</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C'est le première étape pour produire du
+code machine à partir du programme assembleur que vous avez tapé dans
+un éditeur sous forme de texte (le programme source: <span style="font-style: italic;">start.s</span>)&nbsp; Lors de la compilation, le compilateur produit des fichiers <span style="font-style: italic;">"objets"</span>, d'où l'extension ".o" sur le nom <span style="font-style: italic;">start.o</span>.
+	  </li>
+	  
+  <li>Edition de lien (<span style="font-style: italic;">ld</span>):<br>Cette étape permet de créer un exécutable à
+partir de plusieurs fichiers "objets". C'est souvent le cas lors du
+développement de gros logiciels. Dans notre cas, nous n'avons qu'un
+seul fichier objet, mais l'étape est nécessaire pour transformer notre
+fichier <span style="font-style: italic;">"objets"</span> en un exécutable, ici au format ELF (<span style="font-style: italic;">kernel.elf</span>).
+	  </li>
+
+	  <li>Création d'un binaire (<span style="font-style: italic;">objcopy</span>):<br>
+	    Cette dernière étape est requise par QEMU, il s'agit de produire un fichier binaire (<span style="font-style: italic;">kernel.bin</span>) à partir de l'exécutable.</li>
+	</ul>
+	<p>Pour démarrer QEMU et l'amener à charger et exécuter votre programme, utilisez la cible makefile appelée "qemu", comme ceci:
+	</p>
+	<textarea class="terminal" rows="8">  $ make qemu
+  /usr/bin/qemu-system-arm -M versatilepb -nographic -m 64M -gdb tcp::1234 -S -k en-us -kernel kernel.bin 
+  pulseaudio: set_sink_input_volume() failed
+  pulseaudio: Reason: Invalid argument
+  pulseaudio: set_sink_input_mute() failed
+  pulseaudio: Reason: Invalid argument
+	</textarea>
+	<p>Comme vous pouvez le voir, rien ne se passe. En fait, QEMU est arrêté en attente de connexion du débogueur. <br>
+</p>
+	<p>Pour lancer le débogueur, ouvrez d'abord un autre terminal
+(agrandissez le si nécessaire). Ensuite, dans ce terminal, utilisez la
+cible "gdb", comme ceci:
+	</p>
+	<textarea class="terminal" rows="13">  $ make gdb
+  /usr/bin/arm-none-eabi-gdb kernel.elf
+  GNU gdb (7.10-1ubuntu3+9) 7.10
+  Copyright (C) 2015 Free Software Foundation, Inc.
+  ...
+  Reading symbols from start.elf...done.
+  0x00000000 in ?? ()
+  Breakpoint 1 at 0x10000: file start.s, line 3.
+
+  Breakpoint 1, _start () at start.s:3
+  3		mov r0, #0	   
+  (gdb) 
+	</textarea>
+	<span style="font-family: Arial,Serif;"><span style="font-weight: bold;"><br>
+<br>
+Note:</span> il est possible que vous n'obteniez pas cette sortie si c'est la première fois que vous utilisez <span style="font-style: italic;">gdb</span>.
+Il donne un message d'erreur qui vous indique ce qui ne va pas et
+comment le réparer. Alors lisez-le et faites ce que l'on vous demande
+de faire. <b>On a tendance à ne pas lire les messages d'erreur,
+et c'est une faute grave</b>, ils donnent souvent la clé du problème . <br>
+Au passage si l'erreur concerne un droit d'accès, nous vous suggérons
+de ne pas autoriser le chemin d'accès complet, mais plutôt votre
+répertoire personnel, afin que vous autorisiez le débogage n'importe où
+dans celui ci.<br>
+<br>
+Votre programme s'exécute maintenant dans la machine virtuelle. A
+l'aide du debugeur vous pouvez contrôler son exécution. Vous allez
+pouvoir grâce à lui, vous arrêtez où vous voulez, exécuter les
+instructions une par une, observez le contenu de la mémoire, des
+registres ....<br>
+<br>
+</span><span style="font-family: Arial,Serif;">Vous verrez, le
+débogueur est un <span style="font-weight: bold;">outil fantastique</span> pour apprendre à programmer un
+ordinateur et ceci dans n'importe quel langage de programmation.<br>
+<br>
+</span><span style="font-family: Arial,Serif;">Avant toute chose, vous devez apprendre à sortir de <span style="font-weight: bold; font-style: italic;">gdb</span>. Il y a deux commandes qui vous permettront de sortir de la simulation.<br>
+<br>
+.</span>
+	<textarea class="terminal" rows="9">  $ make gdb
+  ...
+  Breakpoint 1, _start () at start.s:3
+  3		mov r0, #0	   
+  (gdb) kill
+  Kill the program being debugged? (y or n) y
+  (gdb) quit
+  $
+	</textarea>
+	<p>Vous
+remarquerez que QEMU s'est arrêté quand gdb l'a tué (<span style="font-style: italic;">kill</span>). Si jamais
+vous aviez besoin de tuer QEMU, à partir de son propre terminal, le
+Ctrl-C habituel ne fonctionne pas. QEMU nécessite une séquence
+différente: "Ctrl-a puis c" . Vous obtenez alors la console QEMU, la
+commande <span style="font-style: italic;">quit</span> permet alors de quitter QEMU.<br>
+</br>
+Pour aller encore plus vite, la combinaison "Ctrl-a puis x" fait l'équivalent.
+</p>
+	<textarea class="terminal" rows="12">  $ make qemu
+  /usr/bin/qemu-system-arm -M versatilepb -nographic -m 64M -gdb tcp::1234 -S -k en-us -kernel start.bin 
+  pulseaudio: set_sink_input_volume() failed
+  pulseaudio: Reason: Invalid argument
+  pulseaudio: set_sink_input_mute() failed
+  pulseaudio: Reason: Invalid argument
+  Ctrl-A C
+  QEMU 2.5.0 monitor - type 'help' for more information
+  (qemu) quit
+  $ 
+	</textarea>
+
+	<br>
+<br>Bien, maintenant que nous savons comment démarrer at arrêter QEMU
+et GDB, nous pouvons passer à l'étape suivante: l'exécution du
+programme.<br>
+ <div id="footer">
+	  © UFR IM2AG
+	  <div id="bottom-links" style="float: right;">
+	    <a href="../index.html">Home</a> 
+	  </div>
+	</div>
+      </div>
+    </div>
+  </body></html>

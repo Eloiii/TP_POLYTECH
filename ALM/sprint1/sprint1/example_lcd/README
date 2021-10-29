@@ -1,0 +1,36 @@
+README
+======
+
+This small dirty test aims at drawing pixels in the qemu window using the
+clcd device of the versatilpb platform
+
+Requirements to run the test:
+- arm-none-eabi toolchain in the PATH
+- arm-none-eabi-gdb installed
+- qemu-system-arm installed
+
+
+## How to run the test
+
+1. Generate the binary: 'make'
+2. Start qemu and boot the binary: 'make qemu'
+3. A black qemu window should open. qemu now waits gdb to continue the program
+4. start gdb: 'make gdb'
+5. In gdb, resume the execution: 'cont' or 'c'
+6. There may be a few breakpoints you should pass before the qemu window shows a
+purple background with a black square on it. If that's the case, you passed the test !
+
+
+## How it works
+
+The lcd_test.c file contains the test. It works like that:
+1. The clcd device is initialize with some magic values (check the doc on that)
+2. The address of the framebuffer is set
+3. There's actually two frame buffer to perform double buffering and avoid weird
+flickering effects
+4. In the main loop, the non drawn buffer is filled with pixel colors
+5. Then we swap the currently drawn buffer
+
+A better way to do that would be to be sure to swap between two frames. But
+that's just a dirty little test...
+

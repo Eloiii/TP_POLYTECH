@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en-US"><head>
+
+
+
+
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"><title>Workshop: Programming Basics</title>
+  
+
+  
+  
+  <meta name="CHANGEDBY" content="Pr. Olivier Gruber">
+
+  
+  <link rel="stylesheet" href="../style.css" type="text/css">
+
+  
+  <script src="../common.js"></script>
+  
+  <link rel="stylesheet" href="../highlight.js/styles/default.css">
+
+  
+  <script src="../highlight.js/highlight.pack.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script></head><body onload="shellOnLoad()">
+<script>
+      function shellOnLoad() {
+        multiLang();
+        /*hljs.initHighlightingOnLoad(); */
+      }  
+    </script>
+<div id="outer-container">
+<div id="header">
+<div id="logo"> <img src="../logo_uga.png" alt="Université Grenoble-Alpes" border="0" height="100"> <img src="../logo_reseau_polytech.gif" alt="Polytech" border="0" height="80">
+</div>
+<div id="top-links"> <a href="../index.html">Home</a> </div>
+</div>
+<div id="inner-container">
+<h1>Bases de l'assembleur<br>
+</h1>
+<h2>Task1 -- Execution Flow</h2>
+<h3>Step2: Exécution en pas à pas<br>
+</h3>
+<p>Maintenant que nous savons lancer QEMU et GDB, nous pouvons
+exécuter un premier programme instruction par instruction. </br>
+Restez dans le répertoire <b><i>task1</i></b>. Voici le
+programme assembleur se trouvant dans le fichier <span style="font-style: italic;">start.s:</span> </p>
+<pre><code class="arm"><br>.global _start<br>_start:<br>	mov r0, #0	 // load r0 with 0<br>_loop:	                 // loop until r0==5<br>	cmp r0, #5	 // compare r0 with 5<br>	bge _halt        // if r0&gt;=5, branch to _halt<br>	add r0, r0, #1   // increment the register r0<br>	b   _loop        // loop over<br>_halt:<br>	b _halt          // spinning until powered down.<br>	</code></pre>
+<p>Plusieurs choses à observer dans ce fichier:</p>
+<p>il y a des choses qui ne sont pas des instructions assembleur:</p>
+<p><span style="font-weight: bold; font-style: italic;"><span style="font-family: Times New Roman,Times,serif;">.global _start </span>:
+</span>c'est une directive qui permet au compilateur de savoir ou
+commence le programme.</p>
+<p>&nbsp;<span style="font-weight: bold; font-style: italic; font-family: Times New Roman,Times,serif;">_start,
+_loop,</span><code class="arm"><span style="font-weight: bold; font-style: italic; font-family: Times New Roman,Times,serif;">_halt</span>:<span style="font-family: Helvetica,Arial,sans-serif;">ceux sont des
+étiquettes qui permet de se repérer dans le programme.</span></code></p>
+<pre style="font-family: Times New Roman,Times,serif; font-weight: bold; font-style: italic;"><big><code class="arm"><span style="font-family: Helvetica,Arial,sans-serif;"></span></code></big><span style="font-weight: bold; font-style: italic; font-family: Times New Roman,Times,serif;">// load r0 with 0 : </span><span style="font-weight: bold; font-family: Times New Roman,Times,serif;"></span><span style="font-weight: bold; font-family: Times New Roman,Times,serif;"></span><span style="font-family: Times New Roman,Times,serif; font-weight: normal;"></span><span style="font-family: Times New Roman,Times,serif; font-weight: normal;">tout ce qui suit // est un commentaire</span><big><code class="arm"><span style="font-family: Helvetica,Arial,sans-serif;"></span></code></big></pre>
+<p><code class="arm"><span style="font-family: Helvetica,Arial,sans-serif;">Le reste sont des
+instructions qui seront exécutées par le processeur.</span><br>
+</code></p>
+<p>La première instruction stocke la valeur 0 dans le registre <span style="font-style: italic;">r0</span> </p>
+<p>Alors, exécutons ce programme sur la machine virtuelle QEMU sous
+le contrôle du debogueur gdb. Vous vous rappelez comment ? Génial.
+Sinon, revenez à l'étape précédente. </p>
+<p>Une fois que vous avez lancé Qemu et le débogueur, nous
+devons changer la disposition de l'écran du débogueur afin que nous
+puissions mieux voir où nous en sommes dans le code. Demandons à gdb de
+changer sa disposition: </p>
+<textarea class="terminal" rows="4">(gdb) layout next 
+(gdb) layout next 
+(gdb) help layout </textarea>
+<p>On
+peut visualiser l'exécution du programme sous différentes formes. Le
+changement de forme est circulaire, il n'y a donc aucun risque,
+continuez à demander la mise en page suivante et vous finirez par
+revenir à celui que vous avez actuellement. Vous pouvez aussi accéder directement à une forme. Faites <span style="font-style: italic; font-weight: bold;">help layout</span> pour comprendre comment.</p>
+<p>Quoi qu'il en soit, vous
+devriez voir quelque chose comme ceci: </p>
+
+<img src="gdb-layout.png" width="80%">
+<p>Vous pouvez voir
+que l'exécution est arrêtée à l'adresse 0x10000. Cela signifie que le
+processeur va chercher l'instruction suivante à exécuter à partir de
+cette adresse. Vous pouvez le vérifier en observant le registre r15,
+également appelé compteur de programme (PC). </p>
+<p>
+Le compteur de programme (PC), contient l'adresse en mémoire de la prochaine instruction à
+exécuter. Lorsque le processeur veut exécuter la prochaine instruction, il
+charge l'instruction à l'adresse contenue dans PC, l'exécute, incrémente la
+valeur de PC pour qu'elle corresponde à l'adresse de l'instruction suivante, et
+ainsi de suite jusqu'à la fin des temps (ou l'extinction du processeur).
+</p>
+<p>
+Comment visualiser la valeur d'un registre ? Juste comme ça:&nbsp;<textarea class="terminal" rows="6"> (gdb) print /x $pc 
+</p>
+$1 = 0x10000 
+(gdb) p /x $r15 
+$2 = 0x10000 
+(gdb) </textarea>
+<p>Remarque: Une des forme donnée par <span style="font-style: italic;">layout
+next</span> montre les registres et la source
+du programme, cela peut s'avérer utile, plutôt que d'avoir à demander à
+visualiser la valeur des registres au cas par cas.</p>
+<p>La commande <span style="font-style: italic; font-weight: bold;">print</span>
+peut être abrégée avec juste "<span style="font-style: italic; font-weight: bold;">p</span>". Notez
+également le "<span style="font-weight: bold;">/ x</span>", il demande
+la valeur à imprimer en hexadécimal, plutôt que décimal. Enfin, notez
+la notation bizarre pour les registres: <span style="font-style: italic; font-weight: bold;">$ pc</span> au lieu de
+seulement pc. Souvenez-vous également que le compteur de programme est
+en fait le registre r15.&nbsp; </p>
+<p>Pour exécuter une seule instruction, rien de plus simple, demandez
+simplement à gdb de le faire avec l'instruction <span style="font-weight: bold; font-style: italic;">stepi</span>, qui peut
+être abrégée avec <span style="font-weight: bold; font-style: italic;">si</span>.
+Cela devrait ressembler à ceci : </p>
+<img src="gdb-0x10004.png" width="80%">
+<p>Le processeur a exécuté la première instruction, en déplaçant la
+valeur 0 dans son registre <span style="font-style: italic; font-weight: bold;">r0</span>.
+Ce faisant, il a augmenté la valeur de son compteur de programme, donc
+r15 a la valeur 0x10004.</p>
+<p> Pourquoi 0x10004? Parce que toutes <span style="font-weight: bold;">les
+instructions ont une longueur de 4 octets</span> en mémoire. Regardez
+sur le
+côté gauche, vous pouvez voir les adresses de chaque instruction. <br>
+</p>
+<p><span style="font-weight: bold;">Notation hexadécimale</span>: le <span style="font-style: italic; font-weight: bold;">0x</span> permet de
+préciser que les adresses sont données en hexadécimal (base 16). Cette
+notation est plus pratique que la base 2. A noter qu'un chiffre
+hexadécimal représente 4 bits. Voici un tableau donnant la conversion
+binaire, décimal, héxadécimal pour les 16 chiffres hexadécimaux.</p>
+
+<table>
+<tbody>
+<tr>
+<th>binary</th>
+<th>hexa</th>
+<th>decimal</th>
+</tr>
+<tr>
+<th>0000</th>
+<th>0x0</th>
+<th>0</th>
+</tr>
+<tr>
+<th>0001</th>
+<th>0x1</th>
+<th>1</th>
+</tr>
+<tr>
+<th>0010</th>
+<th>0x2</th>
+<th>2</th>
+</tr>
+<tr>
+<th>0011</th>
+<th>0x3</th>
+<th>3</th>
+</tr>
+<tr>
+<th>...</th>
+<th>...</th>
+<th>...</th>
+</tr>
+<tr>
+<th>1010</th>
+<th>0xA</th>
+<th>10</th>
+</tr>
+<tr>
+<th>1011</th>
+<th>0xB</th>
+<th>11</th>
+</tr>
+<tr>
+<th>...</th>
+<th>...</th>
+<th>...</th>
+</tr>
+<tr>
+<th>1111</th>
+<th>0xF</th>
+<th>15</th>
+</tr>
+</tbody>
+</table>
+<p>On passe ainsi de l'adresse 0x10008 à 0x1000C (dans la liste des
+adresses d'instructions qui se suivent en mémoire) puisque C représente
+la valeur 12 (en décimal). De même on passe de 0x1001C à 0x10020. <br>
+</p>
+<p>Vous pouvez essayer le programme <span style="font-style: italic; font-weight: bold;">gnome-calculator</span>,
+il est génial, il convertit les nombres dans les différentes bases
+(décimaux, hexadécimaux et binaires).<br>
+<br>
+Vous
+pouvez voir où se trouve l'exécution, regardez la ligne en
+surbrillance. Vous pouvez également imprimer la valeur de r0 et
+vérifier que c'est bien la valeur 0. </p>
+
+<textarea class="terminal" rows="6"> (gdb) p /x $r15 
+$3 = 0x10004 
+(gdb)p /x $r0 
+$4 = 0x0 
+(gdb) </textarea>
+<p>Alors allez-y, continuez seul à exécuter les instructions une par
+une à l'aide de <span style="font-weight: bold; font-style: italic;">stepi</span>.
+Comprenez au passage l'instruction <span style="font-weight: bold; font-style: italic;">add r0, r0, #1</span> </p>
+<p> <b>Avez-vous remarqué la boucle dans le programme?</b> Voyez
+comment le processeur remonte à l'etiquette <span style="font-style: italic; font-weight: bold;">_loop </span><span style="font-weight: bold;"></span>(adresse 0x10004) à cause de
+l'instruction de branchement <span style="font-weight: bold; font-style: italic;">b _loop</span><br>
+</p>
+<p> Comment se passe ce branchement ? D'habitude le processeur passe à
+l'exécution de l'instruction qui se trouve après l'instruction courante
+(4 adresses plus loin en mémoire): le compteur programme est augmenté
+de 4. L'instruction de branchement <span style="font-weight: bold; font-style: italic;">b</span> va modifier ce
+comportement en affectant à <span style="font-style: italic; font-weight: bold;">pc l'</span>adresse
+correspondante à l'étiquette donnée (ici <span style="font-style: italic; font-weight: bold;">_loop</span>=
+0x10004).&nbsp; </p>
+<p>Si nous continuons l'exécution nous constatons que l'on sort de
+cette boucle par l'instruction <span style="font-weight: bold; font-style: italic;">bge _halt </span><span style="font-weight: bold;"></span>qui est aussi une instruction de
+branchement mais <span style="font-weight: bold;">conditionnelle</span>.
+En effet le branchement n'a lieu que si la condition "<span style="font-weight: bold; font-style: italic;">ge</span>" (Great or
+Equal) est vraie. Mais qu'est ce qui est plus grand ou égal ?</p>
+<p>Ce sont les arguments de l'instruction précédente <span style="font-weight: bold; font-style: italic;">cmp r0, #5</span>, donc
+ici le registre <span style="font-style: italic;">r0</span> et la
+valeur 5.</p>
+<p>Donc le branchement n'a lieu que si r0 est plus grand ou égal à 5.
+Vérifiez que tout cela est vrai en observant <span style="font-style: italic;">r0</span>.<br>
+</p>
+<p>La fin du programme consiste en une boucle infinie sur l'étiquette <span style="font-weight: bold; font-style: italic;">_halt</span></p>
+<p><span style="font-weight: bold; font-style: italic;">______________________________________________________________________________<br>
+</span> </p>
+<p>Résumons les instructions que nous avons éxécutées:<br>
+</p>
+<ul>
+  <li> <em>mov</em> reg, #imm<br>
+Stocke une valeur imm dans yun registre reg<br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> mov r3, #2  </code></pre>
+  </li>
+  <li> <em>Il existe aussi mov</em> reg1, reg2<br>
+le registre <em>reg1</em> prend la valeur du <em>reg2</em> <br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> mov r3, r2  </code></pre>
+  </li>
+  <li> <em>cmp</em> reg, #imm<br>
+Compare en vue d'une instruction&nbsp; de branchement une valeur imm
+avec le registre reg. <br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> cmp r3, #23  </code></pre>
+  </li>
+  <li> <em>cmp</em> reg1, reg2<br>
+Compare la valeur du registre <em>reg1</em> avec la valeur du registre
+    <em>reg2</em>. Le résultat de cette comparaison est stocké dans un registre
+    spécifique appelé <b>cpsr</b> <br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> cmp r3, r7  </code></pre>
+  </li>
+  <li> <em>bge</em> label<br>
+Branchement à l'étiquette label si "supérieur ou égal" suivant les
+arguments de l'instruction de comparaison précédente.<br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> bge _halt  </code></pre>
+    <br>
+    <br>
+    <b>Note:</b> Différentes conditions de branchement existent:<br>
+    <br>
+    <ul>
+      <li>beq: branch if equal </li>
+      <li>bne: branch if not equal </li>
+      <li>blt: branch if less than </li>
+      <li>ble: branch if less than or equal </li>
+      <li>bgt: branch if greater than </li>
+      <li>bge: branch if greater than or equal </li>
+    </ul>
+    Ces branchement conditionnels utilise la valeur du registre <b>cpsr</b>
+    modifié par l'instruction <b>cmp</b>.
+  </li>
+  <li> <em>b</em> label<br>
+Branchement toujours à l'étiquette label<br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> b _halt  </code></pre>
+  </li>
+  <li> <em>add</em> reg1, reg2, #imm<br>
+Additionne la valeur du registre reg2 et de la valeur imm, le résutat
+est stocké dans le registre reg1<br>
+    <br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> add r1, r2, #15  </code></pre>
+  </li>
+  <li> <em>add</em> reg1, reg2, reg3<br>
+Additionne la valeur du registre reg2 et celle du registre reg3, le
+résutat est stocké dans le registre reg1<br>
+Exemple:
+    <pre style="display: inline;"><code class="arm" style="display: inline;"> add r1, r1, r10  </code></pre>
+    <br>
+    <br>
+    <b>Note:</b> les instructions de soustraction (sub) et de
+multiplication (mul) ont la même syntaxe que add </li>
+</ul>
+<div id="footer"> © UFR IM2AG
+<div id="bottom-links" style="float: right;"> <a href="../index.html">Home</a>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

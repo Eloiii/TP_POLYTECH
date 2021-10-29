@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/task7.dir/pendu.c.o -o task7 

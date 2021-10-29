@@ -1,0 +1,3 @@
+/home/eloi/Prog-C/Atelier 1/task7/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/eloi/Prog-C/Atelier 1/task7/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/eloi/Prog-C/Atelier 1/task7/cmake-build-debug/CMakeFiles/task7.dir

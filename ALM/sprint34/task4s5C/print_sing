@@ -1,0 +1,10 @@
+_start:
+    ldr r0, .string_ptr
+    bl print_string
+/*
+...
+*/
+.string_ptr:
+    .word string
+string:
+    .ascii "CA MARCHE ! \000"
