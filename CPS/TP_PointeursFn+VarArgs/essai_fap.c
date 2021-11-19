@@ -16,14 +16,27 @@ void aide()
   fprintf(stderr,"q                  :   quitter ce programme\n");
 }
 
+
+int comparaison(int a, int b) {
+  int res;
+  if(a > b)
+    res = 1;
+  else if(a < b)
+    res = -1;
+  else
+    res = 0;
+  return res;
+}
+
 int main()
 {
   char buffer[TAILLE_BUFFER];
   char commande;
   int nombre,priorite;
   fap f;
-
-  f = creer_fap_vide();
+  int (*pointeur_fonction)(int ,int );
+  pointeur_fonction = comparaison;
+  f = creer_fap_vide(pointeur_fonction);
   aide();
   while (1)
     {

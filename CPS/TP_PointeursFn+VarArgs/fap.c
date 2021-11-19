@@ -1,12 +1,14 @@
 #include "fap.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <math.h>
 
-fap creer_fap_vide()
+fap creer_fap_vide(int (*pointeur_fonction)(int ,int ))
 {
   fap resultat;
 
   resultat.tete = NULL;
+  resultat.fonction_comapraison = pointeur_fonction;
   return resultat;
 }
 
@@ -61,7 +63,7 @@ void
 detruire_fap(fap f)
 {
   int element, priorite;
-  
+
   while (!est_fap_vide(f))
       f = extraire(f,&element,&priorite);
 }
