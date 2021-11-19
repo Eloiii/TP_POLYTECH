@@ -54,7 +54,7 @@ Arbre ConstruireArbre(fap file) {
         file = extraire(file, &a1, &freq1);
         file = extraire(file, &a2, &freq2);
         fap_vide = est_fap_vide(file);
-        z = NouveauNoeud(a1, '#', a2);
+        z = NouveauNoeud(a1, '^', a2);
         file = inserer(file, z, freq1 + freq2);
         a1 = ArbreVide();
         a2 = ArbreVide();
@@ -62,10 +62,17 @@ Arbre ConstruireArbre(fap file) {
     return z;
 }
 
+void ConstruireCode_rec(Arbre huff, int lg) {
+    if(EstVide())
+        return;
+    if(FilsGauche(huff) == NULL && FilsDroit(huff) == NULL) {
+
+    }
+
+}
 
 void ConstruireCode(Arbre huff) {
-    /* A COMPLETER */
-    printf("Programme non realise (ConstruireCode)\n");
+    ConstruireCode_rec(huff, -1);
 }
 
 void Encoder(FILE *fic_in, FILE *fic_out, Arbre ArbreHuffman) {
