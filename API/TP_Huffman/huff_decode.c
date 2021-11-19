@@ -5,7 +5,7 @@
 #include "bfile.h"
 
 void Decoder(FILE *fichier_encode, Arbre ArbreHuffman) {
-        AfficherArbre(ArbreHuffman);
+            AfficherArbre(ArbreHuffman);
     /* A COMPLETER */
     printf("Programme non realise (Decoder)\n");
 }

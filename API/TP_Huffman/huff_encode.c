@@ -11,22 +11,21 @@ typedef struct {
 } TableOcc_t;
 
 struct code_char HuffmanCode[256];
-
 void ConstruireTableOcc(FILE *fichier, TableOcc_t *TableOcc) {
 
     int c;
-
-    /* A COMPLETER ... */
-    printf("Programme non realise (ConstruireTableOcc)\n");
+    int i;
+    for (i = 0; i < 256; ++i)
+    {
+        TableOcc->tab[i] = 0;
+    }
 
     c = fgetc(fichier);
     while (c != EOF) {
-        /* A COMPLETER ... */
+        TableOcc->tab[c] += 1;
         c = fgetc(fichier);
     };
 
-
-    int i;
     for (i = 0; i < 256; i++) {
         if (TableOcc->tab[i] != 0)
             printf("Occurences du caractere %c (code %d) : %d\n", i, i,
@@ -35,15 +34,32 @@ void ConstruireTableOcc(FILE *fichier, TableOcc_t *TableOcc) {
 }
 
 fap InitHuffman(TableOcc_t *TableOcc) {
-    /* A COMPLETER */
-    printf("Programme non realise (InitHuffman)\n");
-    return NULL;
+    fap my_fap = creer_fap_vide();
+    for (int carac = 0; carac < 256; ++carac)
+    {
+        if (TableOcc->tab[carac] != 0) {
+            Arbre elem = NouveauNoeud(ArbreVide(), carac, ArbreVide());
+            int freq = TableOcc->tab[carac];
+            my_fap = inserer(my_fap, elem, freq);
+        }
+    }
+    return my_fap;
 }
 
 Arbre ConstruireArbre(fap file) {
-    /* A COMPLETER */
-    printf("Programme non realise (ConstruireArbre)\n");
-    return ArbreVide();
+    Arbre z = ArbreVide(), a1 = ArbreVide(), a2 = ArbreVide();
+    int fap_vide = 0, freq1 = 0, freq2 = 0;
+    while(!fap_vide)
+    {
+        file = extraire(file, &a1, &freq1);
+        file = extraire(file, &a2, &freq2);
+        fap_vide = est_fap_vide(file);
+        z = NouveauNoeud(a1, '#', a2);
+        file = inserer(file, z, freq1 + freq2);
+        a1 = ArbreVide();
+        a2 = ArbreVide();
+    }
+    return z;
 }
 
 
@@ -74,7 +90,7 @@ int main(int argc, char *argv[]) {
     /* Construire l'arbre d'Huffman */
     Arbre ArbreHuffman = ConstruireArbre(file);
 
-        AfficherArbre(ArbreHuffman);
+    AfficherArbre(ArbreHuffman);
 
     /* Construire la table de codage */
     ConstruireCode(ArbreHuffman);
