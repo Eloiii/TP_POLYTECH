@@ -62,12 +62,22 @@ Arbre ConstruireArbre(fap file) {
     return z;
 }
 
-void ConstruireCode_rec(Arbre huff, int lg) {
-    if(EstVide())
-        return;
+char ConstruireCode_rec(Arbre huff, int lg) {
+    if(EstVide(huff))
+        return -1;
     if(FilsGauche(huff) == NULL && FilsDroit(huff) == NULL) {
-
+        return Etiq(huff);
+    } else {
+        int gauche = ConstruireCode_rec(FilsGauche(huff), lg+1);
+        HuffmanCode[gauche] = gauche;
+        HuffmanCode[gauche].lg = lg+1;
+        HuffmanCode[gauche].code[lg+1] = 1;
+        int droit = ConstruireCode_rec(FilsDroit(huff), lg+1);
+        HuffmanCode[droit] = droit;
+        HuffmanCode[droit].lg = lg+1;
+        HuffmanCode[droit].code[lg+1] = 1;
     }
+    return 0;
 
 }
 
