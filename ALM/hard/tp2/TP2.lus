@@ -1,0 +1,136 @@
+-- Détermination de la première opérande X --
+-- Nous déterminons X en fonction de uc0 et uc1 entrés et de A--
+function operande1 <<const n : int>>(A : bool^n; uc1,uc0 : bool) returns ( X:bool^n);
+	var nA: bool^n;
+let
+	(nA) = map << not ; n>>(A);
+	(X)= mux41_nbit << n >> (A,nA,A,false^n,uc1,uc0);
+	-- On calcule avec un multiplexeur 4 vers 1 la valeur de X comme vu dans le compte-rendu
+tel;
+
+
+
+-- Détermination de la première opérande Y --
+-- Nous déterminons Y en fonction de uc0 et uc1 entrés et de B --
+function operande2 <<const n : int>>(B : bool^n; uc1,uc0 : bool) returns ( Y:bool^n);
+var nB: bool^n;
+let
+	(nB) = map << not ; n>>(B);
+	(Y)= mux41_nbit << n >> (nB,false^n,B,B,uc1,uc0);
+tel;
+
+
+
+
+
+
+-- Calcul de v0 --
+-- Equation obtenue à l'aide d'un tableau de Karnaugh depuis la table de vérité avec uc1 et uc0 en entrées --
+function calcV0 (uc1,uc0 : bool) returns (s : bool);
+let
+	s = not(uc1) or uc0;
+tel;
+
+
+
+
+-- UAL n Bits --
+-- Opérations de l'UAL:
+------ 00 : Soustraction (A-B)
+------ 01 : Opposé de A
+------ 10 : Addition (A+B) 
+------ 11 :	Incrémentation (B+1)
+function UALnbit <<const n : int>> (A, B : bool^n; uc1, uc0 : bool) returns (T : bool^n; Z, C, N, V : bool);
+var v0,ret: bool;
+-- v0 = retenue entrante et ret stocke temporairement la retenue entrante --
+var X,Y : bool^n;
+-- Opérandes de l'additionneur --
+let
+	v0 = calcV0(uc1,uc0);
+	X = operande1<<n>> (A,uc1,uc0);
+	Y = operande2<<n>> (B,uc1,uc0);
+	(T, Z, ret, N, V) = addnbit<<n>>(X,Y,v0);
+	C = mux41(not ret,ret,ret,ret,uc1,uc0);
+	-- C doit être inversé si on utilise le soustracteur --
+tel;
+
+
+const x = 4;
+function ual4bits = UALnbit<<x>>;
+
+
+
+
+
+-- additionneur 1bit --
+function add1bit ( a , b, c : bool)
+returns (r, cout : bool );
+let
+	r = a xor b xor c;
+	cout = (a and b) or (b and c) or (a and c);
+tel;
+
+
+
+
+-- additionneur n bits --
+function addnbit << const n : int >> (A, B: bool^n; cin : bool)
+returns (R : bool ^ n; Z, C, N, V  : bool);
+var re : bool^n+1;
+let	
+	re[0]=cin; 
+	(R,re[1..n])= map << add1bit; n >> (A, B,re[0..n-1]) ;
+	Z = not(ornbit <<n>>(R));
+	C = re[n];
+	N = R[n-1];
+	V = re[n-1] xor re[n];
+tel;
+
+
+
+
+-- OR n bits nous aidant à calculer le flag Z --
+function ornbit <<const n : int >> (e :bool^n)
+returns (s : bool);
+var t: bool^n;
+let
+	t[0]= e[0];
+	t[1..n-1] = map << or; n-1 >> (t[0..n-2],e[1..n-1]);
+	s = t[n-1];
+tel;
+
+
+
+
+-- soustracteur n bits --
+function subnbit <<const n: int>>( A , B : bool^n ; ein : bool )
+returns ( R : bool^n ; Z, C, N, V : bool);
+var T , NA : bool^n; Nadd : bool;
+let
+	(NA) = map << not; n >> (A);
+	(T, Z, C,Nadd , V) = addnbit<<n>>( NA,B,ein);
+	(R) = map << not; n >> (T);
+	N= not Nadd;
+tel;
+
+
+
+
+-- Multiplexeur 4 vers 1 -- 
+function mux41(a,b,c,d, uc1,uc0 : bool)
+-- a,b,c,d sont les quatres entrées du multiplexeur --
+returns (s: bool);
+let
+	s= (not(uc1) and not(uc0) and a) or (not(uc1) and uc0 and b) or (uc1 and not(uc0) and c) or (uc1 and uc0 and d);
+tel;
+
+
+
+
+-- Multiplexeur 4 vers 1 sur nbits --
+-- Généralisation du multiplexeur 4 vers 1 sur n bits --
+function mux41_nbit <<const n: int>>(A, B, C, D : bool^n ; s1,s2 :bool) 
+returns (F :bool^n);
+let
+	F = map <<mux41 ; n>> (A, B, C, D, s1^n,s2^n);
+tel;

@@ -1,0 +1,29 @@
+node unebascule (D, Enable, Reset, Set : bool)
+returns (Q, QB: bool)
+let
+	Q = false -> not(Enable and not pre D) and (pre D or (Enable and pre D));
+	QB = not Q;
+tel;
+
+node registrenbits <<const n: int>> (E : bool^n; Enable, Reset, Set : bool )
+returns (S: bool^n)
+var SB: bool^n;
+let
+	(S, SB) = map<<unebascule, n>>(E, Enable^n, Reset^n, Set^n);
+tel;
+
+const x = 4;
+node registre = registrenbits<<x>>;
+
+
+node bascule(D, Reset: Bool)
+returns(Q: bool)
+let
+	Q = false -> not Reset or pre D;
+tel;
+
+node compteur (Reset: bool)
+returns (S: bool^n)
+let
+	S = map<<bascule, n>>();
+tel;

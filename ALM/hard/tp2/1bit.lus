@@ -5,6 +5,8 @@ let
 	cout = (a and b) or (b and cin) or (a and cin);
 tel;
 
+---------------------------------------
+
 function addnbits <<const n: int>>(A , B : bool^n ; cin : bool)
 returns (R : bool^n ; cout : bool);
 -- Fonction qui réalise une addition de n bits
@@ -23,13 +25,18 @@ tel;
 const x = 4;
 function addxbits = addnbits<<x>>;
 
+---------------------------------------
 
---function ual <<const n: int>>(A, B: bool^n ; uc1, uc0 : bool)
---returns (T : bool^n ; V,Z,N,C : nool);
---let
---	if uc1 and not uc0 then 
---		T = addnbits<<n>>  
---tel;
+function ual <<const n: int>>(A, B: bool^n ; uc1, uc0 : bool)
+returns (T : bool^n ; V,Z,N,C : bool);
+let
+	
+tel;
+
+const ratio = 4;
+function UAL = ual<<ratio>>;
+
+---------------------------------------
 
 function opposenbits<<const n: int>>(A: bool^n)
 returns (T: bool^n);
@@ -40,6 +47,8 @@ let
 	T[0..n-1] = map <<oppose, n>>(A);
 tel;
 
+---------------------------------------
+
 function oppose(a: bool)
 returns (r: bool)
 -- Fonction qui inverse un bit
@@ -47,6 +56,8 @@ returns (r: bool)
 let
 	r = not a;
 tel;
+
+---------------------------------------
 
 function opposenbitscomplement<<const n: int>>(A: bool^n)
 returns (T: bool^n);
@@ -61,8 +72,7 @@ tel;
 const z = 8;
 function opposenbitscomp = opposenbitscomplement<<z>>;
 
-
-
+---------------------------------------
 
 function subnbits <<const n: int>>(A , B : bool^n ; cin : bool)
 returns (R : bool^n ; cout : bool);
@@ -76,10 +86,41 @@ let
 	invB = opposenbits<<n>>(B); -- OU opposenbitscomplement<<n>>(B);
 	retint[0]= true;
 	(R, retint[1..n])= map<<add1bit, n >>( A, invB, retint[0..n-1]);
-	cout= retint[n];
+	cout= not retint[n];
 tel;
 
 const y = 4;
 function subxbits = subnbits<<y>>;
+
+---------------------------------------
+
+function increm <<const n: int>>(B : bool^n)
+returns (R : bool^n; V, Z, N, C: bool);
+-- Fonction qui réalise une incrémentation de 1 bit sur B
+-- B es un tableau de booléens et représente l'opérande
+var b: bool^n;
+var retfin: bool;
+var tempZ: bool;
+let
+	b[1..n-1] = false^(n-1);
+	b[0] = true;
+	(R, retfin) = addnbits<<n>>(B, b, false);
+	N = retfin;
+	tempZ = map<<checkZero, n-1>>(R[0..n-2], R[1..n-1]);
+	Z = not tempZ;
+	C = retfin;
+	V = false; -- car complément à 2
+tel;
+
+const b = 4;
+function incrementation = increm<<b>>;
+
+--------------------------------------
+
+function checkZero(a,b: bool)
+returns (v: bool);
+let
+	v = a or b;
+tel;
 
 
