@@ -1,0 +1,104 @@
+include "memoire.lus"
+
+--------------------------------------------------------------------------------
+-- Calcul des sorties de la machine a cafe
+
+-- Calcul des sorties d'un automate de Moore
+function CalculSortieMoore(EtatCourant1,EtatCourant2:bool)
+returns(S1,S2:bool);
+let
+--Par exemple
+S1=EtatCourant1 ;
+S2=EtatCourant2 ;
+tel;
+--------------------------------------------------------------------------------
+-- Calcul des sorties d'un automate de Mealy
+function CalculSortieMealy(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4, RIEN,s10,s20,s50,FS:bool)
+returns(AUCUNE,C,B,R:bool);
+let
+R = (EtatCourant1 and s50) or EtatCourant3 and (s20 or s50);
+B = (EtatCourant1 and (s50 or s20)) or EtatCourant3 and (s10 or s20 or s50);
+C = (EtatCourant1 and (s50 or s20)) or EtatCourant3 and (s10 or s20 or s50);
+AUCUNE= (RIEN and (EtatCourant1 or EtatCourant2 or EtatCourant3 or EtatCourant4)) or (FS and (EtatCourant2 or EtatCourant4)) or (EtatCourant1 and s10);
+tel;
+--------------------------------------------------------------------------------
+-- Calcul de l'etat suivant de la machine a cafe
+function CalculEtatSuivant(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4, RIEN,s10,s20,s50,FS : bool)
+returns(EtatSuivant1,EtatSuivant2,EtatSuivant3,EtatSuivant4:bool);
+let
+--Par exemple
+EtatSuivant1 = (EtatCourant1 and RIEN) or (FS and (EtatCourant2 or EtatCourant4));
+EtatSuivant2 = (EtatCourant2 and RIEN) or (EtatCourant1 and s20) or (s10 and EtatCourant3);
+EtatSuivant3 = (EtatCourant3 and RIEN) or s10 and EtatCourant1;
+EtatSuivant4 = (EtatCourant4 and RIEN) or (EtatCourant3 and (s20 or s50)) or (EtatCourant1 and s50);
+tel;
+--------------------------------------------------------------------------------
+-- Codage des entrees
+--function CodageEntree(S10,S20,S50,FS,RIEN:bool)
+--returns(E1,E2:bool);
+--let
+--Par exemple
+--E1= S10 or S20;
+--E2= RIEN or FS or S50;
+--tel;
+--------------------------------------------------------------------------------
+-- Codage des sorties
+--function CodageSortie(S1,S2:bool)
+--returns(R, Cafe,B,AUCUNE :bool);
+--let
+--Par exemple
+--R= S1 or S2;
+--Cafe= S1;
+--B=true;
+--AUCUNE=false;
+--tel;
+--------------------------------------------------------------------------
+-- Automate machine a cafe
+-- Des entrees:
+--------  S10,S20,S50: les pieces
+--        FS: Fin de service
+--        RIEN
+-- Des sorties:
+--        R : calculer et Rendre la monnaie
+--        Cafe: Servir le cafe
+--        B: Bloquer l'entree des pieces
+--        AUCUNE: pas de sortie
+-- un reset
+
+-- une partie calculant l'etat suivant à partir de l'état courant et des entrees
+-- une partie calculant les sorties à partir de l'état courant (et des entrees pour mealy)
+
+node machinecafe  (reset:bool; S10,S20,S50,FS,RIEN:bool)
+returns (R, Cafe,B,AUCUNE, EtatCourant1, EtatCourant2, EtatCourant3, EtatCourant4:bool);
+-- si on veut visualiser l'etat courant
+-- returns (R, Cafe,B,AUCUNE:bool,EtatCourant1,EtatCourant2:bool);
+--var EtatCourant1, EtatCourant2,EtatCourant3,EtatCourant4 :bool;
+var EtatSuivant1, EtatSuivant2, EtatSuivant3, EtatSuivant4:bool;
+
+let
+--Codage entrees
+--(E1,E2)=CodageEntree(S10,S20,S50,FS,RIEN);
+
+--Codage sorties
+--(R, Cafe,B,AUCUNE)=CodageSortie(S1,S2);
+
+--Memorisation de l'etat courant
+-- on suppose que l'etat initial est 00000, a changer au niveau du set/reset des bascules sinon
+EtatCourant1= bascule(EtatSuivant1,true,false,reset);
+EtatCourant2= bascule(EtatSuivant2,true,reset,false);
+EtatCourant3= bascule(EtatSuivant3,true,reset,false);
+EtatCourant4= bascule(EtatSuivant4,true,reset,false);
+
+--Calcul de l'état suivant
+(EtatSuivant1,EtatSuivant2,EtatSuivant3,EtatSuivant4) = CalculEtatSuivant(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4,RIEN,S10,S20,S50,FS);
+
+--Calcul des sorties
+--En Moore
+--(S1,S2)= CalculSortieMoore(EtatCourant1,EtatCourant2);
+--En Mealy
+--(S1,S2)= CalculSortieMealy(EtatCourant1,EtatCourant2,E1,E2);
+
+(AUCUNE,Cafe,B,R) = CalculSortieMealy(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4, RIEN,S10,S20,S50,FS);
+tel;
+
+

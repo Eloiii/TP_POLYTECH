@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------
+----- mux 2 vers 1 ----------
+
+function mux1(i,t,e:bool)returns(s:bool);
+let
+s=i and t or not i and e;
+-- si i = 1, on a t, si i = 0, on a e
+tel;
+-------------------------------------------------------------------------
+----- bascule 1 bits ----------
+
+node bascule(ent,char,reset,set : bool)
+returns(sort:bool)
+var D:bool;
+let
+D=set or(not reset and mux1(char,ent,sort));
+sort = true -> pre D;
+tel;
+-------------------------------------------------------------------------
+------registre n bits avec enable-------------
+node registren <<const n : int>> (ent : bool^n; char: bool)
+returns (sort : bool^n)
+let
+sort = map<<bascule;n>>(ent,char^n,false^n,false^n);
+tel;
+
+node registre4bits = registre<<4>>;

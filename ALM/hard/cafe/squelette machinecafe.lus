@@ -1,0 +1,74 @@
+include "memoire.lus"
+
+--------------------------------------------------------------------------------
+-- Calcul des sorties de la machine a cafe
+
+-- Calcul des sorties d'un automate de Moore
+function CalculSortieMoore(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4:bool)
+returns(R, Cafe,B,AUCUNE:bool);
+let
+R=...;
+Cafe=...;
+...
+tel;
+
+--------------------------------------------------------------------------------
+-- Calcul de l'etat suivant de la machine a cafe
+function CalculEtatSuivant(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4,S10,S20,S50,FS,RIEN:bool)
+returns(EtatSuivant1,EtatSuivant2,EtatSuivant3,EtatSuivant4:bool);
+let
+--si on veut un automate deterministe il faudrait rajouter une fleche par entree meme si elles sont supposees ne pas pouvoir arriver
+-- q1 et FS ->q1,
+-- q2 et FS ->q2
+-- q3 et FS -> q3 , q3 et (S10 or s20 or S50)->q3
+-- q4 et FS -> q3 ,q4 et (S10 or s20 or S50)->q4
+--ATTENTION Il faut qu'a tout moment une et une seule des entrees soit a 1 sans quoi l'automate ne fonctionne pas comme voulu
+
+EtatSuivant1=...
+...
+
+tel;
+
+--------------------------------------------------------------------------
+-- Automate machine a cafe
+-- Des entrees:
+--------  S10,S20,S50: les pieces
+--        FS: Fin de service
+--        RIEN
+-- Des sorties:
+--        R : calculer et Rendre la monnaie
+--        Cafe: Servir le cafe
+--        B: Bloquer l'entree des pieces
+--        AUCUNE: pas de sortie
+-- un reset
+
+-- une partie calculant l'etat suivant à partir de l'état courant et des entrees
+-- une partie calculant les sorties à partir de l'état courant (et des entrees pour mealy)
+
+----Codage 1 parmi n des etats, des entrees et des sorties
+
+--ATTENTION Il faut qu'a tout moment une et une seule des entrees soit a 1 sans quoi l'automate ne fonctionne pas comme voulu
+
+node machinecafe  (reset:bool; S10,S20,S50,FS,RIEN:bool)
+--returns (R, Cafe,B,AUCUNE:bool);
+-- si on veut visualiser l'etat courant
+returns (R, Cafe,B,AUCUNE:bool;EtatCourant1,EtatCourant2, EtatCourant3, EtatCourant4:bool);
+--var EtatCourant1, EtatCourant2 , EtatCourant3, EtatCourant4 :bool;
+var EtatSuivant1, EtatSuivant2,EtatSuivant3, EtatSuivant4:bool;
+
+
+let
+--Memorisation de l'etat courant
+-- on suppose que l'etat initial est 1000, a changer au niveau du set/reset des bascules sinon
+EtatCourant1= bascule(EtatSuivant1,true,false,reset);
+...
+--Calcul de l'état suivant
+(EtatSuivant1,EtatSuivant2,EtatSuivant3,EtatSuivant4)=CalculEtatSuivant(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4,S10,S20,S50,FS,RIEN);
+
+--Calcul des sorties
+--En Moore
+(R, Cafe,B,AUCUNE)= CalculSortieMoore(EtatCourant1,EtatCourant2,EtatCourant3,EtatCourant4);
+
+tel;
+
+
