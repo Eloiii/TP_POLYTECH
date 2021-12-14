@@ -1,0 +1,36 @@
+function puis=puiss<<8>>;
+
+function puiss <<const n: int>> (x:int)
+returns (p:int);
+let
+p= with (n=1) then (1)
+else (x*puiss<<n-1>>(x));
+tel;
+
+--------------------------------------------------------------------
+-- retourne l'entier represente en base 2  dans le booleen sur n bits
+function entiernat <<const n: int>> (M: bool^n)
+returns (S:int);
+var i:int;
+let
+i= if (M[0]) then 1 else 0;
+S=with (n=1) then (i)
+else  ( 2*entiernat <<n-1>> (M[1..n-1]) + i);
+
+tel;
+
+--------------------------------------------------------------------------
+-- retourne l'entier relatif represente en complement a 2  dans le booleen sur n bits
+function entierrel <<const n:int>>( M: bool^n)
+returns (S:int);
+
+let
+-- si entier negatif alors S= valeur M en base 2 -( 2 puissance n+1)
+-- sinon S= valeur M en base 2
+S=if(M[n-1]) then (entiernat<<n>>(M)-puiss<<n+1>>(2)) else entiernat<<n>>(M);
+
+tel;
+
+
+function instentier = entierrel<<4>>;
+
