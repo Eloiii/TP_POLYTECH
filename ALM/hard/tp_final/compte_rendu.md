@@ -23,5 +23,14 @@ geometry: margin=20mm
 
 **voir memoire.lus**
 
+## 3.4 - La partie contrôle
+
+### 1.
+
+Voici le graphe de l'automate de contrôle de la PO.
+Nous avons traduit l'algorithme donné dans le sujet en associant à chaque état une opération de l'algorithme (affectation ou test).
+
+![Automate de contrôle de la PO](autfix.png){height=300px width=450px}
+
 
 
