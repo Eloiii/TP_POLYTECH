@@ -1,0 +1,77 @@
+include "pc.lus"
+include "UALDivisionAffDecV6.lus"
+include "memoire.lus"
+
+const n=8;
+
+-- multiplicateur par 2
+-- a : entrée à multiplier
+-- s : sortie multipliée par 2
+
+node MUL2<<const n:int>>(a : bool^n)
+returns(s : bool^(n));
+let
+	s[0]=false;
+	s[1..n-1]=a[0..n-2];	
+tel
+
+-- diviseur par 2
+-- a : entrée à diviser
+-- s : sortie divisée par 2
+
+node DIV2<<const n:int>>(a : bool^n)
+returns(s : bool^(n));
+let
+	s[n-1]=false;
+	s[0..n-2]=a[1..n-1];	
+tel
+
+
+node PO(BusEntrees : bool^n;chQ,chR,chA,chB,chK,muxAR,muxB,muxQ,opA0,opA1,uc0,uc1,j0:bool)
+returns(Z,C : bool;BusR,BusQ: bool^n);
+	var V,N : bool;Se,BusB,BusK,BusQ2,BusBdiv2,BusB2,BusMB,BusMQ,BusOp,BusUAL,BusA,BusMAR : bool^n;
+let
+	-- multiplexeur d'entree
+	Se = map<< mux21 ; n>>(j0^n,BusEntrees,BusUAL);
+
+	-- listre registre
+	BusR = registren <<n>>(Se,chR);
+	BusQ = registren<<n>>(Se,chQ);
+	BusB = registren<<n>>(Se,chB);
+	BusK = registren<<n>>(Se,chK);
+	BusA = registren<<n>>(Se,chA);
+
+	-- multiplication/division
+	BusQ2 = MUL2(BusQ);
+	BusB2 = MUL2(BusB);
+	BusBdiv2 = DIV2(BusB);
+
+	-- multiplexeur 2 vers 1
+	BusMQ = map<< mux21 ; n>>(muxQ^n,BusQ,BusQ2);
+	BusMB = map<< mux21 ; n>>(muxB^n,BusB2,BusBdiv2);
+
+	BusMAR = map<< mux21; n>>(muxAR^n, BusA, BusR);
+
+
+	-- multiplexeur 4 vers 1
+	BusOp = mux41_nbit << n >> (BusMAR,BusK,BusMB,BusMQ,opA0,opA1);
+
+	-- UAL
+	(Z,N,V,C,BusUAL) =ual_n_bits(BusOp,BusB,uc1,uc0);
+
+tel
+
+node MAIN(BusEntree : bool^n;begin,reset : bool)
+returns(BusSortieR,BusSortieQ : bool^n;stop : bool;Q,R : int)
+	var Z,C,j0,opA0,opA1,muxB,muxQ,chB,chK,chQ,chR,uc1,uc0,chA,muxAR : bool;
+let
+	(stop,chQ,chR,chA,chB,chK,muxAR,muxB,muxQ,opA0,opA1,uc0,uc1,j0) = PC(reset,begin,Z,C);
+
+	(Z,C,BusSortieR,BusSortieQ) = PO(BusEntree,chQ,chR,chA,chB,chK,muxAR,muxB,muxQ,opA0,opA1,uc0,uc1,j0);
+
+
+	R = entiernat(BusSortieR);
+	Q = entiernat(BusSortieQ);
+tel
+
+

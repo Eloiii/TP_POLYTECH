@@ -1,0 +1,51 @@
+-------------------------------------------------------------------------
+-- transpose un tableau de type t de taille m*n en un tableau de taille n*m
+function transpose<<const n:int; const m:int; type t>>(x:t^m^n) returns (y:t^n^m);
+let
+    -- avec une facon de parler du tableau vide, je pourrais m'arreter
+    -- a 0 et rendre vide^m ici. []^m fonctionne ? non, mais il pourrait.
+  y =
+--  with n = 0 then []
+  with n = 1 then 
+     map<<scal_to_array<<t>>, m >>(x[0])      
+  else
+     ajoute_debut_vect <<n-1,m,t>>(x[0], transpose<<n-1,m,t>>(x[1..n-1]));
+tel
+-------------------------------------------------------------------------
+function scal_to_array<<type t>>(x:t) returns (res:t^1);
+let
+  res = [x];
+tel
+-------------------------------------------------------------------------
+function ajoute_debut_vect<<const n:int; const m:int; type t>>
+        (x:t^m; y:t^n^m) 
+returns (res:t^(n+1)^m);
+let
+  res = 
+    with m = 1 then
+         [ [ x[0]] | y[0] ]
+    else
+         [ [ x[0]] | y[0] ] | ajoute_debut_vect<<n,m-1,t>> (x[1..m-1], y[1..m-1]);
+tel
+  -- end of ajoute_debut_vext
+
+-------------------------------------------------------------------------
+node test_transpose(x:int^4^2) returns (res:int^2^4);
+let
+  res = transpose<<2,4,int>>(x);
+tel
+
+-- Montrons avec lesar que 'transpose o transpose = id'
+-- lv6 transpose.lus -n transpose_est_involutive -ec -o proove_me.ec
+-- lesar proove_me.ec transpose_est_involutive
+node transpose_est_involutive(x:bool^4^2) returns (res:bool);
+var
+  y: bool^2^4;
+  z: bool^4^2;
+let
+  y = transpose<<2,4,bool>>(x);
+  z = transpose<<4,2,bool>>(y);
+  res = ( x = z ); 
+tel
+
+

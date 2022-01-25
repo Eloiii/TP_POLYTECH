@@ -1,0 +1,43 @@
+include "memoire.lus"
+
+
+node PC<<const n:int>>(reset,begin,Z,C : bool)
+returns(stop,chQ,chR,chA,chB,chK,muxAR,muxB,muxQ,opA0,opA1,uc0,uc1,j0: bool)
+	var e,ne : bool^13;
+let
+	ne[0]= reset or (not(begin) and e[0]) or e[12];
+	ne[1]= begin and e[0];
+	ne[2]= e[1] or e[4];
+	ne[3]= e[2] and not(C);
+	ne[4]= e[3];
+	ne[5]= (e[2] and C) or (e[9] and C) or e[11];
+	ne[6]= e[5] and not(Z);
+	ne[7]= e[6];
+	ne[8]= e[7];
+	ne[9]= e[8];
+	ne[10]= e[9] and not(C);
+	ne[11]= e[10];
+	ne[12]= e[5] and Z;
+
+	e[0]=bascule(ne[0],true,false,false);
+	e[1..12]=map<<bascule;12>>(ne[1..12],true^12,reset^12, false^12);
+
+	chQ = e[1] or e[8] or e[11];
+	chR = e[1] or e[9] or e[10];
+	chA = e[1] or e[2];
+	chB = e[2] or e[3] or e[7] or e[9] or e[10];
+	chK = e[1] or e[4] or e[5] or e[6];
+	muxAR = e[9] or e[10];
+	muxB = e[7];
+	muxQ = e[8];
+	opA0 = e[3] or e[7] or e[8] or e[11];
+	opA1 = e[4] or e[5] or e[6] or e[8] or e[11];
+	uc0 = e[1] or e[3] or e[4] or e[5] or e[7] or e[8] or e[11];
+	uc1 = e[1] or e[3] or e[5] or e[6] or e[7] or e[8];
+	j0 = e[1];
+
+	stop = e[12];
+
+tel
+
+

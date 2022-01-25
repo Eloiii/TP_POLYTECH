@@ -1,0 +1,101 @@
+include "transpose.lus"
+----------------------------------------------------------------------
+--or n entrees realise a partir de or 2 entrees
+-- solution mauvaise en terme de chemin critique : n-1 étages de and 2 entrees
+
+function ornbits<<const n:int>>(x:bool^n)
+returns(result:bool);
+var res:bool^n;
+let
+res[0]=x[0];
+--res[1..n-1]=res[0..n-2] or x[1..n-1];
+res[1..n-1]= map <<or,n-1>>(res[0..n-2] , x[1..n-1]);
+result=res[n-1];
+tel;
+
+--------------------------------------------------------------------
+--s=ao.b0 + a1b1+ ...am-1 bm-1 pour calculer la sortie de la memoire
+--------
+function andor<<const n:int>>(a,b:bool^n)
+returns (s:bool);
+var prod:bool^n;
+
+let
+prod=map<<and,n>>(a,b);
+s= ornbits<<n>>(prod);
+tel;
+
+--------------------------------------------------------------------
+--decodeur k bits vers 2 puiss k = n fonctions
+-- definition recursive pas evidente, il faut faire un dessin
+
+function decodeur <<const k:int; const n:int>>  (e:bool^k)returns (s:bool^n);
+let
+
+s= with (k=1) then ([not e[0],e[0]])
+else
+map<<and,n div 2>>((not e[k-1])^(n div 2),decodeur<<k-1,n div 2>>(e[0..k-2]))|map<<and,n div 2>>((e[k-1])^(n div 2),decodeur<<k-1,n div 2>>(e[0..k-2]));
+tel
+
+--------------------------------------------------------------------
+--memoire sans decodeur n mot de m bits
+--n registres de m bits
+--n fil de selection sel permettant la selection du mot pour sel[i]=1
+--write = 1 l'entree est memorisee dans le mot selectionne
+--contenu mot selectionne toujours en sortie
+--on ne sait pas faire des bus entrees/sorties en lustre
+--------------------------------------------------------------------
+
+node memoiresansdecodeur<<const n: int; const m: int>> (entree:bool^m; sel:bool^n; write:bool)
+returns(sort:bool^m; sortreg:bool^m^n;);
+-- sort[0]= (sortreg[0,0] and sel0) or (sortreg[1,0] and sel1) or ... (sortreg[m-1,0] and selm-1)
+-- sort[1]= (sortreg[0,1] and sel0) or (sortreg[1,1] and sel1) or ... (sortreg[m-1,1] and selm-1)
+-- sort[m-1]= (sortreg[0,1] and sel0) or (sortreg[1,1] and sel1) or ... (sortreg[m-1,1] and selm-1)
+-- on charge le registre suivant sel et le signal write
+var
+--sortreg:bool^m^n;
+sortinvreg:bool^n^m;
+charger:bool^n;
+let
+charger=map<<and,n>>(write^n,sel);
+sortreg=map<<registren<<m>>,n>>(entree^n,charger);
+
+sortinvreg=transpose<<n,m,bool>>(sortreg);
+sort=map<<andor<<n>>,m>>(sortinvreg,sel^m);
+tel;
+
+--------------------------------------------------------------------
+--memoire avec decodeur n mot de m bits
+--2 puissance k registres de m bits
+--k fil de selection sel avec 2 puissance k = n permettant la selection du kieme mot
+--------------------------------------------------------------------
+node memoire <<const n:int; const k: int; const m: int>>(entree:bool^m; adresse:bool^k; write:bool)
+returns(sort:bool^m; sortreg:bool^m^n;);
+
+var sel:bool^n;
+
+let
+sel=decodeur<<k,n>>(adresse);
+(sort,sortreg)=memoiresansdecodeur<<n,m>>(entree, sel, write);
+tel;
+--------------------------------------------------------------------
+--memoire avec des entiers en entree/sortie
+node memoireint<<const n:int; const k: int; const m: int>>(ent:int; ad:int; write:bool)
+returns(s:int;contenu:int^n);
+
+var entree:bool^m; adresse:bool^k; sort:bool^m;
+sortreg:bool^m^n;
+
+let
+contenu=map<<entiernat<<m>>,n>>(sortreg);
+adresse=entierbool<<k>>(ad);
+entree=entierbool<<m>>(ent);
+(sort,sortreg)= memoire<<n,k,m>>(entree,adresse,write);
+s=entiernat<<m>>(sort);
+tel
+
+node memint=memoireint<<8,3,4>>
+node imem=memoire<<8,3,4>>;
+
+node ramsansdec=memoiresansdecodeur<<2,3>>;
+

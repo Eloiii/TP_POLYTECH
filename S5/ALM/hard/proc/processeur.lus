@@ -1,0 +1,82 @@
+include "procPO.lus"
+include "procPC.lus"
+--------------------------------------------------------------------------
+-- PROCESSEUR JOUET
+-- un bus de donnee en sortie BusDonSort de taille n
+-- un bus de donnee en entree BusDonEnt de taille n
+-- un bus d'adresse : BusAd de taille n
+-- un reset
+-- une commande d'écriture en mémoire : write
+-- pour la lecture le BusDonEnt contient toujours l'octet
+--   se trouvant à l'adresse specifiee sur le bus BusAd
+
+-- Instructions sur deux mots de n bits
+
+-- 4 instructions possibles:
+-- Suivant premier mot de l'instruction:
+-------0: LOAD #VI   Chargement du registre ACC par la valeur VI
+-------1: STORE ADR  MEM[ADR]=ACC
+-------2: ADD ADR    ACC=ACC+MEM[ADR]
+-------3: JUMP ADR   PC= ADR   saut à l'adresse ADR
+
+---ADR ou VI sont dans le deuxieme mot de l'instruction
+----------------------------------------------------------------------------
+node processeur <<const n:int>> ( BusDonEnt:bool^n; reset: bool)
+returns (BusDonSort,BusAd:bool^n; write:bool;
+ACC, RI1, RI2, PC: bool^n;
+Etat:bool^7;
+);
+
+var
+--Compte rendu à destination de la PC : 2 bits de poids faible de RI1
+RI101: bool^2;
+--Commandes provenant de la PC
+SelBusOp2:bool;                -- Selection du Bus Operande 2: 0: BusDonEnt, 1: ACC
+SelBusOp11,SelBusOp10: bool;   -- Selection du Bus Operande 1: 00: RI2, 01: PC, 10 : ACC
+SelBusAd: bool;                -- Selection du Bus adresse: 0: RI2, 1: PC
+chRI1, chRI2, chPC, chACC:bool; --chargement des registres
+OpUAL1,OpUAL0: bool;            --opération dans l'UAL 00: addition, 01 : +1
+resetPC:bool;
+
+let
+---Partie controle
+(SelBusOp11,SelBusOp10,SelBusOp2,SelBusAd,chRI1, chRI2, chPC,chACC,OpUAL1,OpUAL0,resetPC, write,Etat)=processeurPC (reset,RI101);
+
+---Partie operative
+(BusDonSort,BusAd,RI101,ACC, RI1, RI2, PC)=processeurPO<<n>>(BusDonEnt, SelBusOp11,SelBusOp10,SelBusOp2,SelBusAd,chRI1, chRI2, chPC,chACC,OpUAL1,OpUAL0,resetPC);
+tel;
+
+
+
+---------------------------------------------------------------------------------
+--- PROCESSEUR avec ENTREE/SORTIE ENTIERES
+---Entree: valeur du bus donnee en entree en decimal
+---Sortie : affiche les bus de sortie en decimal----------------------------
+---------------------------------------------------------------------------------
+
+node processeurint<<const n:int>> ( BusDonEntInt:int; reset:bool)
+returns (BusAdInt:int; BusDonSortInt:int; write:bool;
+iACC, iRI1, iRI2, iPC: int;
+Etat:bool^7;
+);
+
+var BusAd,BusDonEnt,BusDonSort:bool^n;
+----pour le debug
+ACC, RI1, RI2, PC:bool^n;
+
+let
+BusDonEnt=entierbool<<n>>(BusDonEntInt);
+(BusDonSort,BusAd,write,ACC, RI1, RI2, PC,Etat)=processeur<<n>>(BusDonEnt,reset);
+BusAdInt= entiernat<<n>>(BusAd);
+BusDonSortInt= entiernat<<n>>(BusDonSort);
+
+iACC= entiernat<<n>>(ACC);
+iRI1= entiernat<<n>>(RI1);
+iRI2= entiernat<<n>>(RI2);
+iPC= entiernat<<n>>(PC);
+
+tel;
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+--------simulation sur 8 bits----------------------------
+node procfin=processeurint<<8>>;

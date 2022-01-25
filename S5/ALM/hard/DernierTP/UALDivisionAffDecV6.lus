@@ -1,0 +1,133 @@
+include "entierv6.lus"
+include "memoire.lus"
+--------------------------------------------------------------------------------
+-- ADDITIONNEUR 1 BIT
+--------------------------------------------------------------------------------
+
+-- a et b sont les deux operandes
+-- re est la retenue entrante
+-- rs est la retenue sortante
+-- r est le resultat de a + b + re
+	
+function add_1_bit ( a , b , re : bool ) returns ( rs , r : bool );
+let
+	-- expression booleenne de r et rs
+	r = a xor b xor re;
+	rs = ( a and b ) or ( b and re ) or ( a and re );
+tel;
+
+--------------------------------------------------------------------------------
+-- AND N BITS
+--------------------------------------------------------------------------------
+
+-- fonction qui calcule un AND bit a bit a partir d'une entree codee sur n bits
+-- la fonction realise des appels recursifs
+
+function ANDn <<const n:int>>(ent : bool^n ) returns( sortie : bool);
+	var res : bool^n;
+let
+	res[0] = ent[0];
+res[1..n-1] = map <<and;n-1>> (res[0..n-2] , ent[1..n-1]);
+	sortie = res[n-1];
+tel;
+
+--------------------------------------------------------------------------------
+-- ZERO N BITS
+--------------------------------------------------------------------------------
+
+-- fonction qui retourne 1 si l'entree a vaut 0 sur n bits
+
+function ZEROn << const n : int >> ( a : bool^n ) returns ( r : bool );
+-- r = 1 ssi toutes les entrees ai valent 0
+let
+r = ANDn <<n>> ( map <<not;n>> ( a ));
+tel;
+
+--------------------------------------------------------------------------------
+-- ADDITIONNEUR N BITS
+--------------------------------------------------------------------------------
+-- a et b les deux operandes sur n bits
+-- r le resultat de a+b sur n bits
+-- Z = Zero
+-- N = Negative
+-- C = Retenue sortante
+-- V = Overflow
+
+function add_n_bits << const n : int>> ( a , b : bool^n ; re : bool )
+returns ( Z , N , V , C : bool ; r : bool^n );
+	var retint : bool^n+1;
+let
+	retint[0] = re;
+( retint[1..n] , r ) = map<<add_1_bit;n>> ( a , b , retint[0..n-1] );
+	-- calcul du flag Zero
+	Z = ZEROn << n >> ( r );
+	-- calcul du flag Negative
+	N = r[n-1];
+	-- calcul du flag Overflow
+	V = retint[n] xor retint[n-1];
+	-- calcul de la retenue sortante
+	C = retint[n];
+tel;
+
+--------------------------------------------------------------------------------
+--Calcul du deuxieme operande de l'addition suivant b, uc1 et uc0
+function calculop2 (b,uc1,uc0:bool) returns (op2:bool);
+let
+op2=((not b) and (not uc1) ) or ( (not uc1) and  uc0 );
+tel;
+
+--------------------------------------------------------------------------------
+-- UAL N BITS
+--------------------------------------------------------------------------------
+
+-- A et B sont des nombres codes sur nn bits 
+-- uc1 et uc0 sont les bits de commande qui determinent l'operation a effectuer
+-- uc1,uc0
+--  0   0  A-B
+--  0   1  A-1
+--  1   0  A+1
+--  1   1  A
+
+-- Z : Zero
+-- Z est a 1 si le resultat est nul
+-- N : Negative
+-- N est a 1 si le resultat est strictement negatif
+-- V : Overflow
+-- V est a 1 si le resultat est faux en interpretant les operandes en complement a deux
+
+-- C : Retenue sortante
+-- C est a 1 si la derniere retenue de l'addition (ou le dernier emprunt pour une soustration) est a 1
+-- T est le resultat sur nn bits de l'operation
+
+function ual_n_bits << const n : int >> ( A , B : bool^n ; uc1 , uc0 : bool )
+returns ( Z , N , V , C : bool ; T : bool^n );
+	-- entrees de l'additionneur calculees a partir de uc1, uc0, A et B
+	var X , Y : bool^n;
+	-- retenue entrante et retenue sortante
+	v0 , vs : bool;
+let
+	-- calcul de v0
+	v0 = (not  uc1) or (not uc0 );
+	-- calcul des xi
+    X = A;
+    -- calcul de y0
+    Y[0]= (not B[0]) and (not uc1) and (not uc0);
+	-- calcul des yi pour i=1 à n-1
+    Y[1..n-1] = map<<calculop2 ;n-1>> (B[1..n-1],uc1^(n-1),uc0^(n-1));
+	-- calcul des flags et du resultat a l'aide de l'additionneur n bits
+    ( Z , N , V , vs , T ) = add_n_bits << n >> ( X , Y , v0 );
+	-- calcul du flag C (on doit l'inverser en cas de soustraction si C égal le dernier emprunt)
+	C = (not uc1 and not vs) or ( uc1 and vs ) ;
+tel;
+---------------------------------------------------
+--Instanciation de l'UAL sur 8 bits et affichage en decimal (base 2 et complement a 2)
+const a=8;
+function ual_aff <<const nn:int>>(  A , B : bool^nn ; uc1 , uc0 : bool)
+returns ( Z , N , V , C : bool ; B2 : int ; Ca2: int);
+var R:bool^nn;
+let
+(Z , N , V , C, R)= ual_n_bits <<nn>>( A, B, uc1, uc0);
+Ca2= entierrel <<nn>> ( R);
+B2=entiernat<<nn>> ( R);
+tel;
+function ualinst=ual_aff<<a>>;

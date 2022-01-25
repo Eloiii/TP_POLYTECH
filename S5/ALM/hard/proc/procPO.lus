@@ -1,0 +1,97 @@
+include "UALProc.lus"
+include "circbase.lus"
+include "memoire.lus"
+--------------------------------------------------------------------------------
+-- mux 41  1 BIT
+--------------------------------------------------------------------------------
+function mux41bit(u0,u1,a,b,c,d:bool)returns(s:bool);
+let
+s=(a and not u0 and not u1) or (b and not u0 and  u1) or (c and  u0 and not u1) or (d and  u0 and  u1) ;
+-- si u0u1 = 00 alors a
+-- si u0u1 = 01 alors b
+-- si u0u1 = 10 alors c
+-- si u0u1 = 11 alors d
+tel;
+
+-------------------------------------------------------------------------
+---------- multiplexeur 4 vers 1 sur n bits -------------------------------
+--------------------------------------------------------------------------------
+function mux41 <<const n: int>> (A,B,C,D : bool^n; u0,u1 : bool)
+returns(s : bool^n);
+let
+s = map <<mux41bit;n>>( u0^n ,u1^n ,A, B, C, D) ;
+tel;
+
+--------------------------------------------------------------------------
+-- PARTIE OPERATIVE DU PROCESSEUR JOUET
+--------------------------------------------------------------------------
+-- Bus donnee et Bus Adresse sur n bits
+---Bus Donnee: on ne sait pas faire un bus E/S en Lustre donc
+---- Bus Donnee en entree : BusDonENt
+-----Bus Donnee en sortie : BusDonSort
+-----Bus Adresse: BusAd
+
+----On sort les registres ACC, RI1, RI2, PC pour visualisation
+
+--Commandes:
+----SelBusOp11,SelBusOp10:selection du bus operande 1 (00: RI2, 01: PC, 10 : ACC)
+----SelBusOp2: selection du bus operande 2 (0: BusDonEnt, 1: ACC)
+----SelBusAd: Selection du Bus Adresse (0: RI2, 1: PC)
+----chRI1, chRI2, chPC,chACC: chargement des registres
+----OpUAL1,OpUAL0: Operation de l'UAL
+----OpUAL1 OpUAL0 operation
+---- 0     0        op1+op2
+---- 0     1        op1+1
+---- 1     0        op1
+-- --1     1        op1-op2 (inutilisé)
+----resetPC: mis a 0 du registre PC
+
+--Compte rendus
+----RI101 : 2 bits de poids faible de RI1
+
+----------------------------------------------------------------------------
+node processeurPO <<const n:int>> ( BusDonEnt: bool^n; SelBusOp11,SelBusOp10,SelBusOp2,SelBusAd,chRI1, chRI2, chPC,chACC,OpUAL1,OpUAL0,resetPC:bool)
+returns(BusDonSort: bool^n;BusAd: bool^n;RI101:bool^2;
+---Pour visualiser les registres
+ACC, RI1, RI2, PC: bool^n
+);
+
+var
+--Bus opérandes
+BusOp1,BusOp2:bool^n;
+--Bus resultat
+BusRes:bool^n;
+--flags
+Z,N,C,V:bool;
+--registres
+--RI1,RI2,PC,ACC:bool^n;
+
+let
+
+(Z,N,V,C,BusRes)=ual_n_bits<<n>>(BusOp1,BusOp2,OpUAL1,OpUAL0);
+-- Selection du Bus Operande 1: 00: RI2, 01: PC, 10 : ACC
+BusOp1=mux41<<n>>(RI2,PC,ACC,false^n,SelBusOp11,SelBusOp10);
+
+-- Selection du Bus Adresse: 0: RI2, 1: PC
+BusAd=mux21<<n>>(PC,RI2,SelBusAd);
+
+-- Selection du Bus Operande 2: 0: BusDonEnt, 1: ACC
+BusOp2=mux21<<n>>(ACC,BusDonEnt,SelBusOp2);
+
+-- Les registres
+ACC= registren<<n>>(BusRes,chACC);
+PC= registrenreset<<n>>(BusRes,chPC,resetPC);
+
+RI1= registren<<n>>(BusDonEnt,chRI1);
+RI2= registren<<n>>(BusDonEnt,chRI2);
+
+--le bus de donnee en sortie, toujours égal à ACC
+BusDonSort= ACC;
+
+--les deux bits de poids faible de RI1
+RI101=[RI1[0],RI1[1]];
+
+tel;
+
+node es=processeurPO<<4>>;
+

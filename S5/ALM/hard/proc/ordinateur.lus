@@ -1,0 +1,67 @@
+include "processeur.lus"
+include "ram.lus"
+--------------------------------------------------------------------------
+-- ORDINATEUR JOUET
+-- assemble le PROCESSEUR JOUET et de la memoire
+-- Memoire de n= (2 puissance m) mots de m bits
+-- Registre du processeur de la meme taille que les mots de la memoire
+-- Taille du bus Adresse = m
+
+--En entree:
+--Un bus donnee sous forme d'entier traduit en base 2
+--Un bus adresse sous forme d'entier traduit en base 2
+
+-- En sortie:
+----- le contenu de la memoire: RAM
+----- le signal d'ecriture en memoire donne par le processeur write
+----- l'etat courant du processeur: Etat
+----- les regitres du processeurs: ACC, RI1, RI2, PC
+
+-- On peut remplir la memoire avant d'executer un programme:
+-- InitMem=1
+-- On donne sur le BusDonEntree les valeurs a rentrer dans la memoire
+--   a l'adresse donnee sur le BusAdresse
+-- InitMem=0
+-- on lance le processeur en effectuant un reset
+----------------------------------------------------------------------------
+node ordinateur <<const n:int;const m:int>> (BusDon:int;Adress:int; InitMem, reset: bool)
+returns (ContenuMem:int^n;write:bool;
+iACC, iRI1, iRI2, iPC: int;
+Etat:bool^7;
+);
+
+var
+ACC, RI1, RI2, PC: bool^m;
+donnee, BusDonEnt,BusDonSort: bool^m;
+adresse,BusAd :bool^m;
+sortreg:bool^m^n;
+BusDonEntree:bool^m;BusAdresse:bool^m;
+
+let
+--Passage des entiers aux booleens
+BusAdresse=entierbool<<m>>(Adress);
+BusDonEntree=entierbool<<m>>(BusDon);
+
+-- Les bus donnee et adresse en entree de la memoire proviennent (suivant InitMem)
+----soit de l'exterieur: phase de chargement d'un programme (InitMem=1)
+----soit du processeur : phase dexecution d'un programme  (InitMem=0)
+donnee= mux21<<m>>(BusDonEntree,BusDonSort,InitMem);
+adresse=mux21<<m>>(BusAdresse,BusAd,InitMem);
+
+---PROCESSEUR
+(BusDonSort,BusAd,write,ACC, RI1, RI2, PC,Etat)=processeur<<m>>(BusDonEnt,reset);
+
+---MEMOIRE
+(BusDonEnt,sortreg)= memoire<<n,m,m>>(donnee,adresse,write or InitMem);
+
+--Passage des booleens aux entiers
+iACC= entiernat<<m>>(ACC);
+iRI1= entiernat<<m>>(RI1);
+iRI2= entiernat<<m>>(RI2);
+iPC= entiernat<<m>>(PC);
+ContenuMem=map<<entiernat<<m>>,n>>(sortreg);
+
+tel;
+
+--------simulation sur 8 bits----------------------------
+node ordi=ordinateur<<16,4>>;

@@ -1,0 +1,92 @@
+include "memoire.lus"
+
+--------------------------------------------------------------------------
+-- PARTIE CONTROLE DU PROCESSEUR JOUET
+--
+-- on sort les etats pour visualisation
+
+-- Etat[0]: reset PC
+-------resetPC
+
+-- Etat[1]: RI1=mem[PC] et PC=PC+1
+-------OpUAL1,OpUAL0= 0, 1
+-------chPC, chRI1,
+-------PC sur BusAdresse : SelBusAd=1
+------ SelBusOp11,SelBusOp10= 0,1
+
+-- Etat[2]: RI2=mem[PC] et PC=PC+1
+-------OpUAL1,OpUAL0= 0, 1
+-------chPC, chRI2,
+-------PC sur BusAdresse : SelBusAd=1
+------ SelBusOp11,SelBusOp10= 0,1
+
+-- Etat[3]: ACC=RI2
+-------chACC
+------ SelBusOp11,SelBusOp10= 0,0
+-------OpUAL1,OpUAL0= 1, 0
+
+-- Etat[4]: mem[RI2]=ACC
+--------RI2 sur BusAdresse : SelBusAd=0
+--------write
+--------ACC est toujours sur BusDonSort
+
+-- Etat[5]: ACC=ACC+mem[RI2]
+-------chACC
+-------RI2 sur BusAdresse : SelBusAd=0
+-------OpUAL1,OpUAL0= 0, 0
+-------SelBusOp11,SelBusOp10=1,0
+-------SelBusOp2= BusDonEnt = 0
+-------BusDonEnt toujours relie à la memoire en lecture
+
+-- Etat[6]: PC=RI2
+-------chPC
+-------OpUAL1,OpUAL0= 1, 0
+-------SelBusOp11,SelBusOp10=0,0
+
+----------------------------------------------------------------------------
+node processeurPC  (reset:bool; RI101:bool^2)
+returns(SelBusOp11,SelBusOp10,SelBusOp2,SelBusAd,chRI1, chRI2, chPC,chACC,OpUAL1,OpUAL0,resetPC, write:bool;
+----Pour le debug
+Etat:bool^7;
+);
+var
+--Etat:bool^7;
+EtatSuiv:bool^7;
+
+let
+-----Memorisation de l'etat courant
+Etat[0]=bascule(EtatSuiv[0],true,false,reset); --etat initial mise a 1 au moment du reset
+Etat[1..6]=map<<bascule,6>>(EtatSuiv[1..6],true^6,reset^6,false^6);
+
+------Calcul de l'etat suivant
+EtatSuiv[0]=false;
+EtatSuiv[1]=Etat[0] or Etat[3] or Etat[4] or Etat[5] or Etat[6];
+EtatSuiv[2]=Etat[1];
+EtatSuiv[3]=(not RI101[0]) and (not RI101[1]) and Etat[2];
+EtatSuiv[4]= RI101[0] and (not RI101[1]) and Etat[2];
+EtatSuiv[5]=(not RI101[0]) and  RI101[1] and Etat[2];
+EtatSuiv[6]= RI101[0] and  RI101[1] and Etat[2];
+
+-------Calcul des sorties (commandes de la PO)
+------Chargement des registres
+resetPC=Etat[0];
+chPC=Etat[1] or Etat[2] or Etat[6];
+chACC=Etat[3] or Etat[5];
+chRI1=Etat[1];
+chRI2=Etat[2];
+
+-------Selection des Bus
+SelBusOp11=Etat[5];
+SelBusOp10=Etat[1] or Etat[2];
+SelBusOp2=false; --toujours a 0 car un BusDonnee en entree et un en sortie
+SelBusAd=Etat[1] or Etat[2];
+
+------Operation UAL
+OpUAL1=Etat[3] or Etat[6];
+OpUAL0=Etat[1] or Etat[2];
+
+-----Ecriture memoire
+write=Etat[4];
+tel;
+
+

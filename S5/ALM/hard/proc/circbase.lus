@@ -1,0 +1,58 @@
+--------------------------------------------------------------------------------
+-- AND N BITS
+--------------------------------------------------------------------------------
+
+-- fonction qui calcule un AND bit a bit a partir d'une entree codee sur n bits
+-- la fonction realise des appels recursifs
+
+function ANDn <<const n:int>>(ent : bool^n ) returns( sortie : bool);
+var res : bool^n;
+let
+res[0] = ent[0];
+res[1..n-1] = map <<and;n-1>> (res[0..n-2] , ent[1..n-1]);
+sortie = res[n-1];
+tel;
+
+--------------------------------------------------------------------------
+-- porte OR nbits
+--------------------------------------------------------------------------
+
+function orn <<const n : int>> ( a : bool^n) returns (r : bool);
+var acc : bool^n;
+let
+acc[0] = a[0];
+acc[1..n-1] = map <<or;n-1>> (a[1..n-1] , acc [0..n-2]);
+r = acc[n-1];
+tel;
+
+--------------------------------------------------------------------------------
+-- ZERO N BITS
+--------------------------------------------------------------------------------
+
+-- fonction qui retourne 1 si l'entree a vaut 0 sur n bits
+
+function ZEROn << const n : int >> ( a : bool^n ) returns ( r : bool );
+-- r = 1 ssi toutes les entrees ai valent 0
+let
+r = ANDn <<n>> ( map <<not;n>> ( a ));
+tel;
+
+--------------------------------------------------------------------------------
+-- mux 21  1 BIT
+--------------------------------------------------------------------------------
+function mux21bit(i,t,e:bool)returns(s:bool);
+let
+s=i and t or not i and e;
+-- si i = 1, on a t, si i = 0, on a e
+tel;
+
+-------------------------------------------------------------------------
+---------- multiplexeur 2 vers 1 sur n bits -------------------------------
+--------------------------------------------------------------------------------
+
+function mux21 <<const n: int>> (A,B : bool^n; u : bool)
+returns(s : bool^n);
+let
+s = map <<mux21bit;n>>( u^n ,A, B) ;
+-- si u = 1, on a A, si u = 0, on a B
+tel;

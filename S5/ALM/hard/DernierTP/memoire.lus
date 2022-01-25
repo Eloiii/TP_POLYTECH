@@ -1,0 +1,44 @@
+-- Multiplexeur 4 vers 1 -- 
+node mux41(a,b,c,d, uc1,uc0 : bool)
+-- a,b,c,d sont les quatres entrées du multiplexeur --
+returns (s: bool);
+let
+    s= (not(uc1) and not(uc0) and a) or (not(uc1) and uc0 and b) or (uc1 and not(uc0) and c) or (uc1 and uc0 and d);
+tel;
+
+
+
+
+-- Multiplexeur 4 vers 1 sur nbits --
+-- Généralisation du multiplexeur 4 vers 1 sur n bits --
+node mux41_nbit <<const n: int>>(A, B, C, D : bool^n ; s1,s2 :bool) 
+returns (F :bool^n);
+let
+    F = map <<mux41 ; n>> (A, B, C, D, s1^n,s2^n);
+tel;
+
+-- Multiplexeur 2 vers 1 -- 
+node mux21(i,t,e:bool)returns(s:bool);
+-- t et e sont les quatres entrées du multiplexeur --
+let
+    s=i and t or not i and e;
+tel;
+
+----- bascule 1 bits ----------
+
+node bascule(ent,char,reset,set : bool)
+returns(sort:bool)
+var D:bool;
+let
+D=set or(not reset and mux21(char,ent,sort));
+sort = true -> pre D;
+tel;
+
+------registre n bits avec enable-------------
+node registren <<const n : int>> (ent : bool^n; char: bool)
+returns (sort : bool^n)
+let
+sort = map<<bascule;n>>(ent,char^n,false^n,false^n);
+tel;
+
+function registre4bits = registren<<4>>;

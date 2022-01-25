@@ -1,0 +1,106 @@
+include "entierv6.lus"
+include "circbase.lus"
+
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
+--  multiplexeur 4 entrees 
+--------------------------------------------------------------------------
+
+function mux4(i1,i2,e1,e2,e3,e4: bool) returns (s:bool);
+let
+s=e1 and not i1 and not i2
+or e2 and not i1 and  i2
+or e3 and  i1 and not i2
+or e4 and i1 and i2;
+tel;
+
+
+--------------------------------------------------------------------------------
+-- ADDITIONNEUR 1 BIT
+--------------------------------------------------------------------------------
+
+-- a et b sont les deux operandes
+-- re est la retenue entrante
+-- rs est la retenue sortante
+-- r est le resultat de a + b + re
+
+function add_1_bit ( a , b , re : bool ) returns ( rs , r : bool );
+let
+-- expression booleenne de r et rs
+r = a xor b xor re;
+rs = ( a and b ) or ( b and re ) or ( a and re );
+tel;
+--------------------------------------------------------------------------------
+-- ADDITIONNEUR N BITS
+--------------------------------------------------------------------------------
+-- a et b les deux operandes sur n bits
+-- r le resultat de a+b sur n bits
+-- Z = Zero
+-- N = Negative
+-- C = Retenue sortante
+-- V = Overflow
+
+function add_n_bits << const n : int>> ( a , b : bool^n ; re : bool )
+returns ( Z , N , V , C : bool ; r : bool^n );
+var retint : bool^n+1;
+let
+retint[0] = re;
+( retint[1..n] , r ) = map<<add_1_bit;n>> ( a , b , retint[0..n-1] );
+-- calcul du flag Zero
+Z = ZEROn << n >> ( r );
+-- calcul du flag Negative
+N = r[n-1];
+-- calcul du flag Overflow
+V = retint[n] xor retint[n-1];
+-- calcul de la retenue sortante
+C = retint[n];
+tel;
+
+--------------------------------------------------------------------------
+-- UAL N BITS
+--------------------------------------------------------------------------
+
+-- A et B sont des nombres codes sur n bits en base 2 ou en complement ˆ 2
+-- uc1 et uc0 sont les bits de commande qui determinent l'operation a effectuer:
+--uc1 uc0 operation
+-- 0  0   op1+op2
+-- 0  1   op1+1
+-- 1  0   op1
+-- 1  1   op1-op2
+-- C est la derniere retenue, en cas de soustraction c'est le complement de l'emprunt
+-- V est le flag Overflow
+-- N est le dernier bit du resultat T
+-- Z est ˆ 1 si le resultat T est nul
+-- T est le resultat sur n bits de l'UAL
+
+function ual_n_bits << const n : int >> ( A , B : bool^n ; uc1 , uc0 : bool )
+returns ( Z , N , V , C: bool ; T : bool^n );
+var op1, op2: bool^n; retent:bool;
+
+let
+	--choix des operandes
+op1= A;
+op2=map <<mux4;n>>( uc1^n , uc0^n, B,false^n, false^n,map <<not,n>>(B));
+
+-- retenue entrante a 1 dans le cas ou on veut faire op1+1 et op1-op2
+retent= mux4(uc1,uc0,false,true,false,true);
+
+(Z , N , V , C, T)=add_n_bits<<n>>(op1,op2,retent);
+tel;
+
+--------------------------------------------------------------------------
+const a=8;
+function ualaff<<const n:int>>(  A , B : bool^n ; uc1 , uc0 : bool )
+returns (  Z , N , V , C : bool ; T : bool^n;  AE,BE,R:int );
+let
+( Z , N , V , C,T)=ual_n_bits <<n>>( A , B , uc1 , uc0);
+
+R=entiernat<<n>>(T);
+AE=entiernat<<n>>(A);
+BE=entiernat<<n>>(B);
+
+tel;
+node ualinst=ualaff<<a>>;
+
+

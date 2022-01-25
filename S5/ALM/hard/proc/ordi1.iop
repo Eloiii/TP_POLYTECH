@@ -1,0 +1,62 @@
+module "ordi"
+inputs
+   BusDonEntree_0 : bool;
+   BusDonEntree_1 : bool;
+   BusDonEntree_2 : bool;
+   BusDonEntree_3 : bool;
+   BusAdresse_0 : bool;
+   BusAdresse_1 : bool;
+   BusAdresse_2 : bool;
+   BusAdresse_3 : bool;
+   InitMem : bool;
+outputs
+   ContenuMem_0 : int;
+   ContenuMem_1 : int;
+   ContenuMem_2 : int;
+   ContenuMem_3 : int;
+   ContenuMem_4 : int;
+   ContenuMem_5 : int;
+   ContenuMem_6 : int;
+   ContenuMem_7 : int;
+   ContenuMem_8 : int;
+   ContenuMem_9 : int;
+   ContenuMem_10 : int;
+   ContenuMem_11 : int;
+   ContenuMem_12 : int;
+   ContenuMem_13 : int;
+   ContenuMem_14 : int;
+   ContenuMem_15 : int;
+   write : bool;
+   iACC : int;
+   iRI1 : int;
+   iRI2 : int;
+   iPC : int;
+   Etat_0 : bool;
+   Etat_1 : bool;
+   Etat_2 : bool;
+   Etat_3 : bool;
+   Etat_4 : bool;
+   Etat_5 : bool;
+   Etat_6 : bool;
+panels
+   inpanel = col { $BusDonEntree_0 $BusDonEntree_1 $BusDonEntree_2 
+$BusDonEntree_3 $BusAdresse_0 $BusAdresse_1 $BusAdresse_2 $BusAdresse_3 
+$InitMem
+   };
+   outpanel = col {
+      line { $ContenuMem_0 $ContenuMem_1 $ContenuMem_2 $ContenuMem_3 
+
+      }
+      line { $ContenuMem_4 $ContenuMem_5 $ContenuMem_6 $ContenuMem_7
+      }
+    line { $ContenuMem_8 $ContenuMem_9 $ContenuMem_10 $ContenuMem_11
+      }
+    line {  $ContenuMem_12 $ContenuMem_13 $ContenuMem_14 $ContenuMem_15
+}
+      line {  $write $iACC $iRI1 $iRI2 $iPC
+      }
+      line { $Etat_0 $Etat_1 $Etat_2 $Etat_3 $Etat_4 $Etat_5 $Etat_6
+      }
+   };
+   top = line { $inpanel $outpanel
+   };

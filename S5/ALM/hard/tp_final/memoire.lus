@@ -21,7 +21,7 @@ tel;
 node registren <<const n : int>> (ent : bool^n; char: bool)
 returns (sort : bool^n)
 let
-sort = map<<bascule;n>>(ent,char^n,false^n,false^n);
+	sort = map<<bascule;n>>(ent,char^n,false^n,false^n);
 tel;
 
 node registre4bits = registre<<4>>;
