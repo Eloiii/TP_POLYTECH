@@ -15,6 +15,7 @@ geometry: margin=20mm
 
 ![Schéma de la partie opérative](PO.png){height=300px}
 
+
 ### 3. Codage des commandes de l'UAL
 
 L'UAL nous permet de faire quatre opérations à savoir la soustraction, la décrémentation, l'incrémentation et une opération neutre qui permet de rendre le nombre A comme résultat. Nous pouvons coder uc0 et uc1 comme ceci :
